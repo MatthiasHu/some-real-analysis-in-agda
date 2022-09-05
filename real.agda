@@ -2,6 +2,8 @@
 
 module real where
 
+-- We use version 1.7.1 of the agda standard library.
+
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 import Data.Nat.Properties as ℕ
 open import Data.Rational as ℚ using (ℚ; ½; 0ℚ)
