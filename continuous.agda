@@ -30,7 +30,7 @@ record cont : Set where
 
     cauchy : (a : ℚ) → Cauchy (h a) α
     ucont : (a b : ℚ) → (p n : ℕ) → α p ℕ.≤ n → ℚ.∣ a ℚ.- b ∣ ℚ.≤ ½ ^ (ω p) → ℚ.∣ h a n ℚ.- h b n ∣ ℚ.≤ ½ ^ p
-    -- ...
+    -- Do we need more?
 
 
 --- application of a continuous function to a real number ---
