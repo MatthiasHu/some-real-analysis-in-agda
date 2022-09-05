@@ -3,7 +3,7 @@ module continuous where
 
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 import Data.Nat.Properties as ℕ
-open import Data.Rational as ℚ using (ℚ; ½)
+open import Data.Rational as ℚ using (ℚ; ½; 0ℚ)
 import Data.Rational.Properties as ℚ
 open import Data.Product
 
@@ -14,6 +14,8 @@ open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
 open import real as ℝ using (ℝ; Cauchy; ½^sucp+½^sucp≡½^p)
 
+
+--- definition of continuous functions ---
 
 -- continuous functions represented by approximations of their values on the rationals
 
@@ -30,8 +32,20 @@ record cont : Set where
     ucont : (a b : ℚ) → (p n : ℕ) → α p ℕ.≤ n → ℚ.∣ a ℚ.- b ∣ ℚ.≤ ½ ^ (ω p) → ℚ.∣ h a n ℚ.- h b n ∣ ℚ.≤ ½ ^ p
     -- ...
 
+
+--- application of a continuous function to a real number ---
+
 insert-lemma : (a b c : ℚ) → a ℚ.- c ≡ (a ℚ.- b) ℚ.+ (b ℚ.- c)
-insert-lemma = {!!}
+insert-lemma a b c =
+  begin-equality
+  a - c                     ≡˘⟨ cong (_- c) (ℚ.+-identityʳ a) ⟩
+  (a + 0ℚ) - c              ≡˘⟨ cong (λ z → (a + z) - c) (ℚ.+-inverseˡ b) ⟩
+  (a + (- b + b)) - c       ≡˘⟨ cong (_- c) (ℚ.+-assoc a (- b) b) ⟩
+  ((a - b) + b) - c         ≡⟨ ℚ.+-assoc (a - b) b (- c) ⟩
+  (a - b) + (b - c)         ∎
+  where
+  open ℚ.≤-Reasoning
+  open import Data.Rational -- for unqualified _+_ and _-_
 
 capp : cont → ℝ → ℝ
 ℝ.as (capp f (ℝ.realConstr as M cauchy-as)) n = cont.h f (as n) n 
