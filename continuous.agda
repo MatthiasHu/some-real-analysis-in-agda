@@ -100,43 +100,41 @@ module ConvexCombination
   open ℚ.≤-Reasoning
 
   convex-combination : ℚ → ℚ
-  convex-combination t = (1ℚ - t) * c + t * d
-
-  convex-combination-alternative :
-    (t : ℚ) → convex-combination t ≡ c + t * (d - c)
-  convex-combination-alternative t =
-    begin-equality
-    (1ℚ - t) * c + t * d            ≡⟨ cong (_+ t * d) ( ℚ.*-distribʳ-+ c 1ℚ (- t) )  ⟩
-    (1ℚ * c + (- t) * c) + t * d    ≡⟨ ℚ.+-assoc (1ℚ * c) ((- t) * c) (t * d) ⟩
-    1ℚ * c + ((- t) * c + t * d)    ≡⟨ cong₂ _+_ (ℚ.*-identityˡ c) (ℚ.+-comm ((- t) * c) (t * d)) ⟩
-    c + (t * d + ((- t) * c))        ≡⟨ {!cong (λ -tc → (c + (t * d + -tc))) !} ⟩
-    c + (t * d + t * (- c))        ≡⟨ {!cong (λ -tc → (c + (t * d + -tc))) !} ⟩
-    c + t * (d - c)                ∎
+  convex-combination t = c + t * (d - c)
 
   convex-combination-0 : convex-combination 0ℚ ≡ c
   convex-combination-0 =
     begin-equality
-    1ℚ * c + 0ℚ * d  ≡⟨ cong₂ _+_ (ℚ.*-identityˡ c) (ℚ.*-zeroˡ d) ⟩
-    c + 0ℚ           ≡⟨ ℚ.+-identityʳ c ⟩
-    c                ∎
+    c + 0ℚ * (d - c)   ≡⟨ cong (c +_) (ℚ.*-zeroˡ (d - c)) ⟩
+    c + 0ℚ             ≡⟨ ℚ.+-identityʳ c ⟩
+    c                  ∎
 
   convex-combination-1 : convex-combination 1ℚ ≡ d
   convex-combination-1 =
     begin-equality
-    0ℚ * c + 1ℚ * d  ≡⟨ cong₂ _+_ (ℚ.*-zeroˡ c) (ℚ.*-identityˡ d) ⟩
-    0ℚ + d           ≡⟨ ℚ.+-identityˡ d ⟩
-    d                ∎
+    c + 1ℚ * (d - c)  ≡⟨ cong (c +_) (ℚ.*-identityˡ (d - c)) ⟩
+    c + (d - c)       ≡⟨ cong (c +_) (ℚ.+-comm d (- c)) ⟩
+    c + ((- c) + d)   ≡˘⟨ ℚ.+-assoc c (- c) d ⟩
+    (c - c) + d       ≡⟨ cong (_+ d) (ℚ.+-inverseʳ c) ⟩
+    0ℚ + d            ≡⟨ ℚ.+-identityˡ d  ⟩
+    d                 ∎
+
+  d-c-Positive : Positive (d - c)
+  d-c-Positive = positive
+    (begin-strict
+    0ℚ       ≡˘⟨ ℚ.+-inverseʳ c ⟩
+    c - c    <⟨ ℚ.+-monoˡ-< (- c) c<d ⟩
+    d - c    ∎)
 
   convex-combination-mono :
     (t t' : ℚ) →
     t ℚ.< t' →
     convex-combination t ℚ.< convex-combination t'
-  convex-combination-mono t t' t<t' =
-    begin-strict
-    (1ℚ - t) * c + t * d                ≡⟨ cong (_+ t * d) ( ℚ.*-distribʳ-+ c 1ℚ (- t) )  ⟩
-    (1ℚ * c + (- t) * c) + t * d    ≡⟨ ℚ.+-assoc (1ℚ * c) ((- t) * c) (t * d) ⟩
-    1ℚ * c + ((- t) * c + t * d)    <⟨ {!!} ⟩
-    (1ℚ - t') * c + t' * d    ∎
+  convex-combination-mono t t' t<t' = ℚ.+-monoʳ-< c
+    (begin-strict
+    t * (d - c)    <⟨ ℚ.*-monoˡ-<-pos (d - c) d-c-Positive t<t' ⟩
+    t' * (d - c)   ∎
+    )
 
 
 c-d-lemma : (c d : ℚ) → (c ℚ.< d) → (2/3 ℚ.* c ℚ.+ 1/3 ℚ.* d) ℚ.< (1/3 ℚ.* c ℚ.+ 2/3 ℚ.* d)
