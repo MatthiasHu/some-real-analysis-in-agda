@@ -102,6 +102,17 @@ module ConvexCombination
   convex-combination : ℚ → ℚ
   convex-combination t = (1ℚ - t) * c + t * d
 
+  convex-combination-alternative :
+    (t : ℚ) → convex-combination t ≡ c + t * (d - c)
+  convex-combination-alternative t =
+    begin-equality
+    (1ℚ - t) * c + t * d            ≡⟨ cong (_+ t * d) ( ℚ.*-distribʳ-+ c 1ℚ (- t) )  ⟩
+    (1ℚ * c + (- t) * c) + t * d    ≡⟨ ℚ.+-assoc (1ℚ * c) ((- t) * c) (t * d) ⟩
+    1ℚ * c + ((- t) * c + t * d)    ≡⟨ cong₂ _+_ (ℚ.*-identityˡ c) (ℚ.+-comm ((- t) * c) (t * d)) ⟩
+    c + (t * d + ((- t) * c))        ≡⟨ {!cong (λ -tc → (c + (t * d + -tc))) !} ⟩
+    c + (t * d + t * (- c))        ≡⟨ {!cong (λ -tc → (c + (t * d + -tc))) !} ⟩
+    c + t * (d - c)                ∎
+
   convex-combination-0 : convex-combination 0ℚ ≡ c
   convex-combination-0 =
     begin-equality
