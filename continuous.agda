@@ -3,16 +3,20 @@ module continuous where
 
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 import Data.Nat.Properties as ℕ
+open import Data.Integer as ℤ using ()
 open import Data.Rational as ℚ using (ℚ; ½; 0ℚ)
 import Data.Rational.Properties as ℚ
 open import Data.Product
+open import Data.Sum
 
 open import Relation.Binary.PropositionalEquality
+
+open import Function.Base using (case_of_)
 
 open import Algebra.Bundles using (module Ring)
 open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
-open import real as ℝ using (ℝ; Cauchy; ½^sucp+½^sucp≡½^p; 0ℝ; _≃_)
+open import real as ℝ using (ℝ; Cauchy; ½^sucp+½^sucp≡½^p; 0ℝ; _≃_; fromℚ; approxSplit; fromℚ-preserves-<)
 
 
 --- definition of continuous functions ---
@@ -84,7 +88,68 @@ strictly-increasing f = (x y : ℝ) → x ℝ.< y → capp f x ℝ.< capp f y
 
 --- intermediate value theorem ---
 
--- IVTAux : (f : cont) → strictly-increasing f →
+
+1/3 = ℤ.+ 1 ℚ./ 3
+2/3 = ℤ.+ 2 ℚ./ 3
+
+
+c-d-lemma : (c d : ℚ) → (c ℚ.< d) → (2/3 ℚ.* c ℚ.+ 1/3 ℚ.* d) ℚ.< (1/3 ℚ.* c ℚ.+ 2/3 ℚ.* d)
+c-d-lemma c d c<d = {!!}
+  where
+  open ℚ.≤-Reasoning
+
+
+module IVT
+  (f : cont)
+  (f-inc : strictly-increasing f)
+  (a b : ℚ)
+  (a<b : a ℚ.< b)
+  (fa≤0 : capp f (fromℚ a) ℝ.≤ 0ℝ)
+  (0≤fb : 0ℝ ℝ.≤ capp f (fromℚ b))
+  where
+
+  record RecData : Set where
+    field
+      c : ℚ
+      d : ℚ
+      c<d : c ℚ.< d
+      fc≤0 : capp f (fromℚ c) ℝ.≤ 0ℝ
+      0≤fd : 0ℝ ℝ.≤ capp f (fromℚ c)
+      
+
+  c,d,c<d : ℕ → Σ (ℚ × ℚ) (λ (c , d) → c ℚ.< d)
+  c,d,c<d zero = (a , b) , a<b
+  c,d,c<d (suc n) =
+    let (c , d) , c<d = c,d,c<d n
+        c₀ = 2/3 ℚ.* c ℚ.+ 1/3 ℚ.* d
+        d₀ = 1/3 ℚ.* c ℚ.+ 2/3 ℚ.* d
+        c₀<d₀ : c₀ ℚ.< d₀
+        c₀<d₀ = c-d-lemma c d c<d
+        split = approxSplit
+                  (capp f (fromℚ c₀))
+                  (capp f (fromℚ d₀))
+                  0ℝ
+                  (f-inc (fromℚ c₀) (fromℚ d₀) (fromℚ-preserves-< c₀ d₀ c₀<d₀))
+    in
+    case split of λ
+      { (inj₁ 0≤fd₀) → (c , d₀) , {!!}
+      ; (inj₂ fc₀≤0) → (c₀ , d) , {!!}
+      }
+
+  c d : ℕ → ℚ
+  c n = proj₁ (proj₁ (c,d,c<d n))
+  d n = proj₂ (proj₁ (c,d,c<d n))
+
+  step : (n : ℕ) → d (suc n) ℚ.- c (suc n) ≡ 2/3 ℚ.* (d n ℚ.- c n)
+  step n = {!d (suc n)!}
+
+IVTAux :
+  (f : cont) →
+  strictly-increasing f →
+  (l r : ℝ) →
+  (l ℝ.< r) →
+  Σ ℝ (λ l' → Σ ℝ (λ r' → {!!} × {!!}))
+IVTAux = {!!}
 
 IVT :
   (f : cont) →
