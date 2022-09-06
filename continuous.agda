@@ -4,12 +4,13 @@ module continuous where
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 import Data.Nat.Properties as ℕ
 open import Data.Integer as ℤ using ()
-open import Data.Rational as ℚ using (ℚ; ½; 0ℚ)
+open import Data.Rational as ℚ using (ℚ; ½; 0ℚ; 1ℚ)
 import Data.Rational.Properties as ℚ
 open import Data.Product
 open import Data.Sum
 
 open import Relation.Binary.PropositionalEquality
+open import Relation.Nullary.Decidable
 
 open import Function.Base using (case_of_)
 
@@ -99,18 +100,18 @@ module ConvexCombination
   open import Data.Rational
   open ℚ.≤-Reasoning
 
-  convex-combination : ℚ → ℚ
-  convex-combination t = c + t * (d - c)
+  convex-comb : ℚ → ℚ
+  convex-comb t = c + t * (d - c)
 
-  convex-combination-0 : convex-combination 0ℚ ≡ c
-  convex-combination-0 =
+  convex-comb-0 : convex-comb 0ℚ ≡ c
+  convex-comb-0 =
     begin-equality
     c + 0ℚ * (d - c)   ≡⟨ cong (c +_) (ℚ.*-zeroˡ (d - c)) ⟩
     c + 0ℚ             ≡⟨ ℚ.+-identityʳ c ⟩
     c                  ∎
 
-  convex-combination-1 : convex-combination 1ℚ ≡ d
-  convex-combination-1 =
+  convex-comb-1 : convex-comb 1ℚ ≡ d
+  convex-comb-1 =
     begin-equality
     c + 1ℚ * (d - c)  ≡⟨ cong (c +_) (ℚ.*-identityˡ (d - c)) ⟩
     c + (d - c)       ≡⟨ cong (c +_) (ℚ.+-comm d (- c)) ⟩
@@ -126,113 +127,79 @@ module ConvexCombination
     c - c    <⟨ ℚ.+-monoˡ-< (- c) c<d ⟩
     d - c    ∎)
 
-  convex-combination-mono :
-    (t t' : ℚ) →
+  convex-comb-mono :
+    {t t' : ℚ} →
     t ℚ.< t' →
-    convex-combination t ℚ.< convex-combination t'
-  convex-combination-mono t t' t<t' = ℚ.+-monoʳ-< c
+    convex-comb t ℚ.< convex-comb t'
+  convex-comb-mono {t} {t'} t<t' = ℚ.+-monoʳ-< c
     (begin-strict
     t * (d - c)    <⟨ ℚ.*-monoˡ-<-pos (d - c) d-c-Positive t<t' ⟩
     t' * (d - c)   ∎
     )
-
-
-c-d-lemma : (c d : ℚ) → (c ℚ.< d) → (2/3 ℚ.* c ℚ.+ 1/3 ℚ.* d) ℚ.< (1/3 ℚ.* c ℚ.+ 2/3 ℚ.* d)
-c-d-lemma c d c<d = {!!}
-  where
-  open ℚ.≤-Reasoning
-
-module IVT?
-  (f : cont)
-  (f-inc : strictly-increasing f)
-  (a b : ℚ)
-  (a<b : a ℚ.< b)
-  (fa≤0 : capp f (fromℚ a) ℝ.≤ 0ℝ)
-  (0≤fb : 0ℝ ℝ.≤ capp f (fromℚ b))
-  where
-
-
-  c,d,c<d : ℕ → Σ (ℚ × ℚ) (λ (c , d) → c ℚ.< d)
-  c,d,c<d zero = (a , b) , a<b
-  c,d,c<d (suc n) =
-    let (c , d) , c<d = c,d,c<d n
-        c₀ = 2/3 ℚ.* c ℚ.+ 1/3 ℚ.* d
-        d₀ = 1/3 ℚ.* c ℚ.+ 2/3 ℚ.* d
-        c₀<d₀ : c₀ ℚ.< d₀
-        c₀<d₀ = c-d-lemma c d c<d
-        split = approxSplit
-                  (capp f (fromℚ c₀))
-                  (capp f (fromℚ d₀))
-                  0ℝ
-                  (f-inc (fromℚ c₀) (fromℚ d₀) (fromℚ-preserves-< c₀ d₀ c₀<d₀))
-    in
-    case split of λ
-      { (inj₁ 0≤fd₀) → (c , d₀) , {!!}
-      ; (inj₂ fc₀≤0) → (c₀ , d) , {!!}
-      }
-
-  c d : ℕ → ℚ
-  c n = proj₁ (proj₁ (c,d,c<d n))
-  d n = proj₂ (proj₁ (c,d,c<d n))
-
-  step-d-c : (n : ℕ) → d (suc n) ℚ.- c (suc n) ≡ 2/3 ℚ.* (d n ℚ.- c n)
-  step-d-c n = {!d (suc n)!}
-
 
 module IVT
   (f : cont)
   (f-inc : strictly-increasing f)
   where
 
-  record RecData : Set where
-    constructor recData
+  record correct (c d : ℚ) : Set where
+    constructor mkCorrect
     field
-      c : ℚ
-      d : ℚ
       c<d : c ℚ.< d
       fc≤0 : capp f (fromℚ c) ℝ.≤ 0ℝ
       0≤fd : 0ℝ ℝ.≤ capp f (fromℚ d)
 
-  record compatible (rd rd' : RecData) : Set where
-    open RecData
+  record compatible (c d c' d' : ℚ) : Set where
     field
-      c-mono : c rd ℚ.≤ c rd'
-      d-mono : d rd' ℚ.≤ d rd
-      d-c : d rd' ℚ.- c rd' ≡ 2/3 ℚ.* (d rd ℚ.- c rd)
+      c-mono : c ℚ.≤ c'
+      d-mono : d' ℚ.≤ d
+      d-c : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
 
   IVTAux :
-    (rd : RecData) →
-    Σ RecData (compatible rd)
-  IVTAux (recData c d c<d fc≤0 0≤fd) =
-    let c₀ = 2/3 ℚ.* c ℚ.+ 1/3 ℚ.* d
-        d₀ = 1/3 ℚ.* c ℚ.+ 2/3 ℚ.* d
+    (c d : ℚ) →
+    (correct c d) →
+    Σ (ℚ × ℚ) (λ (c' , d') → correct c' d' × compatible c d c' d')
+  IVTAux c d  (mkCorrect c<d fc≤0 0≤fd) =
+    let open ConvexCombination c d c<d
+        c₀ = convex-comb 1/3
+        d₀ = convex-comb 2/3
         c₀<d₀ : c₀ ℚ.< d₀
-        c₀<d₀ = c-d-lemma c d c<d
+        c₀<d₀ = convex-comb-mono ((from-yes (1/3 ℚ.<? 2/3)))
         split = approxSplit
                   (capp f (fromℚ c₀))
                   (capp f (fromℚ d₀))
                   0ℝ
                   (f-inc (fromℚ c₀) (fromℚ d₀) (fromℚ-preserves-< c₀ d₀ c₀<d₀))
+        open ℚ.≤-Reasoning
+        c<d₀ : c ℚ.< d₀
+        c<d₀ = begin-strict
+                 c               ≡˘⟨ convex-comb-0 ⟩
+                 convex-comb 0ℚ  <⟨ convex-comb-mono ((from-yes (0ℚ ℚ.<? 2/3))) ⟩
+                 d₀              ∎
+        c₀<d : c₀ ℚ.< d
+        c₀<d = begin-strict
+                 c₀              <⟨ convex-comb-mono ((from-yes (1/3 ℚ.<? 1ℚ))) ⟩
+                 convex-comb 1ℚ  ≡⟨ convex-comb-1 ⟩
+                 d               ∎
     in
     case split of λ
       { (inj₁ 0≤fd₀) →
-          record
-          { c = c
-          ; d = d₀
-          ; c<d = {!!}
-          ; fc≤0 = fc≤0
-          ; 0≤fd = 0≤fd₀
-          }
-        , record
-          { c-mono = ℚ.≤-refl
-          ; d-mono = {!!}
-          ; d-c = {!!}
-          }
+          (c , d₀)
+        , ( record
+            { c<d = {!c<d₀!}
+            ; fc≤0 = fc≤0
+            ; 0≤fd = 0≤fd₀
+            }
+          , record
+            { c-mono = ℚ.≤-refl
+            ; d-mono = {!!}
+            ; d-c = {!!}
+            }
+          )
     ; (inj₂ fc₀≤0) →
-          record
-          { c = c₀
-          ; d = d
-          ; c<d = {!!}
+        (c₀ , d)
+      , ( record
+          { c<d = c₀<d
           ; fc≤0 = fc₀≤0
           ; 0≤fd = 0≤fd
           }
@@ -241,9 +208,12 @@ module IVT
           ; d-mono = ℚ.≤-refl
           ; d-c = {!!}
           }
+        )
       }
 
+{-
   IVT :
     RecData →
     Σ ℝ (λ z → capp f z ≃ 0ℝ)
   IVT = {!!}
+-}
