@@ -12,7 +12,7 @@ open import Relation.Binary.PropositionalEquality
 open import Algebra.Bundles using (module Ring)
 open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
-open import real as ℝ using (ℝ; Cauchy; ½^sucp+½^sucp≡½^p)
+open import real as ℝ using (ℝ; Cauchy; ½^sucp+½^sucp≡½^p; 0ℝ; _≃_)
 
 
 --- definition of continuous functions ---
@@ -84,4 +84,13 @@ strictly-increasing f = (x y : ℝ) → x ℝ.< y → capp f x ℝ.< capp f y
 
 --- intermediate value theorem ---
 
--- IVTAux :
+-- IVTAux : (f : cont) → strictly-increasing f →
+
+IVT :
+  (f : cont) →
+  strictly-increasing f →
+  (l r : ℝ) →
+  (capp f l ℝ.≤ 0ℝ) →
+  (0ℝ ℝ.≤ capp f r) →
+  Σ ℝ (λ z → capp f z ≃ 0ℝ)
+IVT = {!!}

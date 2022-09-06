@@ -103,6 +103,7 @@ fromℚ : ℚ → ℝ
   where
   open ℚ.≤-Reasoning
 
+0ℝ = fromℚ 0ℚ
 
 --- basic predicates of real numbers ---
 
