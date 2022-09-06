@@ -88,9 +88,44 @@ strictly-increasing f = (x y : ℝ) → x ℝ.< y → capp f x ℝ.< capp f y
 
 --- intermediate value theorem ---
 
-
 1/3 = ℤ.+ 1 ℚ./ 3
 2/3 = ℤ.+ 2 ℚ./ 3
+
+module ConvexCombination
+  (c d : ℚ)
+  (c<d : c ℚ.< d)
+  where
+
+  open import Data.Rational
+  open ℚ.≤-Reasoning
+
+  convex-combination : ℚ → ℚ
+  convex-combination t = (1ℚ - t) * c + t * d
+
+  convex-combination-0 : convex-combination 0ℚ ≡ c
+  convex-combination-0 =
+    begin-equality
+    1ℚ * c + 0ℚ * d  ≡⟨ cong₂ _+_ (ℚ.*-identityˡ c) (ℚ.*-zeroˡ d) ⟩
+    c + 0ℚ           ≡⟨ ℚ.+-identityʳ c ⟩
+    c                ∎
+
+  convex-combination-1 : convex-combination 1ℚ ≡ d
+  convex-combination-1 =
+    begin-equality
+    0ℚ * c + 1ℚ * d  ≡⟨ cong₂ _+_ (ℚ.*-zeroˡ c) (ℚ.*-identityˡ d) ⟩
+    0ℚ + d           ≡⟨ ℚ.+-identityˡ d ⟩
+    d                ∎
+
+  convex-combination-mono :
+    (t t' : ℚ) →
+    t ℚ.< t' →
+    convex-combination t ℚ.< convex-combination t'
+  convex-combination-mono t t' t<t' =
+    begin-strict
+    (1ℚ - t) * c + t * d                ≡⟨ cong (_+ t * d) ( ℚ.*-distribʳ-+ c 1ℚ (- t) )  ⟩
+    (1ℚ * c + (- t) * c) + t * d    ≡⟨ ℚ.+-assoc (1ℚ * c) ((- t) * c) (t * d) ⟩
+    1ℚ * c + ((- t) * c + t * d)    <⟨ {!!} ⟩
+    (1ℚ - t') * c + t' * d    ∎
 
 
 c-d-lemma : (c d : ℚ) → (c ℚ.< d) → (2/3 ℚ.* c ℚ.+ 1/3 ℚ.* d) ℚ.< (1/3 ℚ.* c ℚ.+ 2/3 ℚ.* d)
@@ -98,8 +133,7 @@ c-d-lemma c d c<d = {!!}
   where
   open ℚ.≤-Reasoning
 
-
-module IVT
+module IVT?
   (f : cont)
   (f-inc : strictly-increasing f)
   (a b : ℚ)
@@ -108,14 +142,6 @@ module IVT
   (0≤fb : 0ℝ ℝ.≤ capp f (fromℚ b))
   where
 
-  record RecData : Set where
-    field
-      c : ℚ
-      d : ℚ
-      c<d : c ℚ.< d
-      fc≤0 : capp f (fromℚ c) ℝ.≤ 0ℝ
-      0≤fd : 0ℝ ℝ.≤ capp f (fromℚ c)
-      
 
   c,d,c<d : ℕ → Σ (ℚ × ℚ) (λ (c , d) → c ℚ.< d)
   c,d,c<d zero = (a , b) , a<b
@@ -140,22 +166,75 @@ module IVT
   c n = proj₁ (proj₁ (c,d,c<d n))
   d n = proj₂ (proj₁ (c,d,c<d n))
 
-  step : (n : ℕ) → d (suc n) ℚ.- c (suc n) ≡ 2/3 ℚ.* (d n ℚ.- c n)
-  step n = {!d (suc n)!}
+  step-d-c : (n : ℕ) → d (suc n) ℚ.- c (suc n) ≡ 2/3 ℚ.* (d n ℚ.- c n)
+  step-d-c n = {!d (suc n)!}
 
-IVTAux :
-  (f : cont) →
-  strictly-increasing f →
-  (l r : ℝ) →
-  (l ℝ.< r) →
-  Σ ℝ (λ l' → Σ ℝ (λ r' → {!!} × {!!}))
-IVTAux = {!!}
 
-IVT :
-  (f : cont) →
-  strictly-increasing f →
-  (l r : ℝ) →
-  (capp f l ℝ.≤ 0ℝ) →
-  (0ℝ ℝ.≤ capp f r) →
-  Σ ℝ (λ z → capp f z ≃ 0ℝ)
-IVT = {!!}
+module IVT
+  (f : cont)
+  (f-inc : strictly-increasing f)
+  where
+
+  record RecData : Set where
+    constructor recData
+    field
+      c : ℚ
+      d : ℚ
+      c<d : c ℚ.< d
+      fc≤0 : capp f (fromℚ c) ℝ.≤ 0ℝ
+      0≤fd : 0ℝ ℝ.≤ capp f (fromℚ d)
+
+  record compatible (rd rd' : RecData) : Set where
+    open RecData
+    field
+      c-mono : c rd ℚ.≤ c rd'
+      d-mono : d rd' ℚ.≤ d rd
+      d-c : d rd' ℚ.- c rd' ≡ 2/3 ℚ.* (d rd ℚ.- c rd)
+
+  IVTAux :
+    (rd : RecData) →
+    Σ RecData (compatible rd)
+  IVTAux (recData c d c<d fc≤0 0≤fd) =
+    let c₀ = 2/3 ℚ.* c ℚ.+ 1/3 ℚ.* d
+        d₀ = 1/3 ℚ.* c ℚ.+ 2/3 ℚ.* d
+        c₀<d₀ : c₀ ℚ.< d₀
+        c₀<d₀ = c-d-lemma c d c<d
+        split = approxSplit
+                  (capp f (fromℚ c₀))
+                  (capp f (fromℚ d₀))
+                  0ℝ
+                  (f-inc (fromℚ c₀) (fromℚ d₀) (fromℚ-preserves-< c₀ d₀ c₀<d₀))
+    in
+    case split of λ
+      { (inj₁ 0≤fd₀) →
+          record
+          { c = c
+          ; d = d₀
+          ; c<d = {!!}
+          ; fc≤0 = fc≤0
+          ; 0≤fd = 0≤fd₀
+          }
+        , record
+          { c-mono = ℚ.≤-refl
+          ; d-mono = {!!}
+          ; d-c = {!!}
+          }
+    ; (inj₂ fc₀≤0) →
+          record
+          { c = c₀
+          ; d = d
+          ; c<d = {!!}
+          ; fc≤0 = fc₀≤0
+          ; 0≤fd = 0≤fd
+          }
+        , record
+          { c-mono = {!!}
+          ; d-mono = ℚ.≤-refl
+          ; d-c = {!!}
+          }
+      }
+
+  IVT :
+    RecData →
+    Σ ℝ (λ z → capp f z ≃ 0ℝ)
+  IVT = {!!}
