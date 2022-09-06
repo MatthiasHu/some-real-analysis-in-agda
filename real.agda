@@ -155,7 +155,14 @@ _+_ : ℝ → ℝ → ℝ
 -_ : ℝ → ℝ
 ℝ.as (- realConstr as M cauchy) n = ℚ.- as n
 ℝ.M (- realConstr as M cauchy) = M
-ℝ.cauchy (- realConstr as M cauchy) = {!!}
+ℝ.cauchy (- realConstr as M cauchy) p n m n≥ m≥ =
+  begin
+  ℚ.∣ ℚ.- as n ℚ.- ℚ.- as m ∣    ≡˘⟨ cong ℚ.∣_∣ (ℚ.neg-distrib-+ (as n) (ℚ.- as m)) ⟩
+  ℚ.∣ ℚ.- (as n ℚ.- as m) ∣      ≡⟨ ℚ.∣-p∣≡∣p∣ (as n ℚ.- as m) ⟩
+  ℚ.∣ as n ℚ.- as m ∣            ≤⟨ cauchy p n m n≥ m≥ ⟩
+  ½ ^ p                          ∎
+  where
+  open ℚ.≤-Reasoning
 
 _-_ : ℝ → ℝ → ℝ
 x - y = x + (- y)
