@@ -47,6 +47,9 @@ Positive-½ = tt
   where
   open ≡-Reasoning
 
+archimedian-ε : (a : ℚ) → ℚ.Positive a → Σ ℕ (λ p → ½ ^ p ℚ.< a)
+archimedian-ε = {!!}
+
 
 --- Cauchy sequence property ---
 
@@ -168,3 +171,20 @@ approxSplit (realConstr as M cauchy) (realConstr bs N cauchy₁) (realConstr cs 
     ; (no ¬p) → inj₂ {!!}
     }
 
+
+--- compatibility of fromℚ with various operations ---
+
+fromℚ-preserves-pos : (a : ℚ) → ℚ.Positive a → pos (fromℚ a)
+fromℚ-preserves-pos a a-positive =
+  let (p , ½^p<a) = archimedian-ε a a-positive
+  in
+  p , ℚ.<⇒≤ ½^p<a
+
+fromℚ-preserves-< : (a b : ℚ) → a ℚ.< b → fromℚ a < fromℚ b
+fromℚ-preserves-< a b a<b = fromℚ-preserves-pos (b ℚ.- a) (ℚ.positive (
+  begin-strict
+  0ℚ        ≡˘⟨ ℚ.+-inverseʳ b ⟩
+  b ℚ.- b   <⟨ ℚ.+-monoʳ-< b (ℚ.neg-antimono-< a<b) ⟩
+  b ℚ.- a   ∎))
+  where
+  open ℚ.≤-Reasoning

@@ -72,4 +72,16 @@ capp : cont → ℝ → ℝ
   m≥α = (ℕ.m⊔n≤o⇒m≤o (α (suc p)) (M (ω (suc p))) m≥)
   m≥M : m ℕ.≥ M (ω (suc p))
   m≥M = (ℕ.m⊔n≤o⇒n≤o (α (suc p)) (M (ω (suc p))) m≥)
+
+-- TODO: capp-preserves-≃
+
+
+--- increasing functions ---
+
+strictly-increasing : cont → Set
+strictly-increasing f = (x y : ℝ) → x ℝ.< y → capp f x ℝ.< capp f y
   
+
+--- intermediate value theorem ---
+
+-- IVTAux :
