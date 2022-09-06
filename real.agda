@@ -121,7 +121,18 @@ private
   differenceOfSums :
     (a b a' b' : ℚ) →
     (a ℚ.+ b) ℚ.- (a' ℚ.+ b') ≡ (a ℚ.- a') ℚ.+ (b ℚ.- b')
-  differenceOfSums = {!!}
+  differenceOfSums a b a' b' =
+    begin-equality
+    (a + b) - (a' + b')     ≡⟨ cong ((a + b) ℚ.+_) (ℚ.neg-distrib-+ a' b') ⟩
+    (a + b) + (- a' - b')   ≡˘⟨ ℚ.+-assoc (a + b) (- a') (- b') ⟩
+    ((a + b) + - a') - b'   ≡⟨ cong (_- b') (ℚ.+-assoc a b (- a')) ⟩
+    (a + (b - a')) - b'     ≡⟨ cong (λ x → (a + x) - b') (ℚ.+-comm b (- a')) ⟩
+    (a + (- a' + b)) - b'   ≡˘⟨ cong (_- b') (ℚ.+-assoc a (- a') b) ⟩
+    ((a - a') + b) - b'     ≡⟨ ℚ.+-assoc (a - a') b (- b') ⟩
+    (a - a') + (b - b')     ∎
+    where
+    open ℚ.≤-Reasoning
+    open import Data.Rational
 
 _+_ : ℝ → ℝ → ℝ
 ℝ.as (realConstr as M cauchy-as + realConstr bs N cauchy-bs) n = as n ℚ.+ bs n
@@ -177,8 +188,7 @@ approxSplit (realConstr as M cauchy) (realConstr bs N cauchy₁) (realConstr cs 
 fromℚ-preserves-pos : (a : ℚ) → ℚ.Positive a → pos (fromℚ a)
 fromℚ-preserves-pos a a-positive =
   let (p , ½^p<a) = archimedian-ε a a-positive
-  in
-  p , ℚ.<⇒≤ ½^p<a
+  in p , ℚ.<⇒≤ ½^p<a
 
 fromℚ-preserves-< : (a b : ℚ) → a ℚ.< b → fromℚ a < fromℚ b
 fromℚ-preserves-< a b a<b = fromℚ-preserves-pos (b ℚ.- a) (ℚ.positive (
