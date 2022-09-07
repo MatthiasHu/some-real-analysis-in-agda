@@ -75,8 +75,17 @@ difference-of-sums a b a' b' =
 insert-lemma : (a b c : ℚ) → a - c ≡ (a - b) + (b - c)
 insert-lemma a b c =
   begin-equality
-  a - c                     ≡˘⟨ cong (_- c) (+-identityʳ a) ⟩
-  (a + 0ℚ) - c              ≡˘⟨ cong (λ z → (a + z) - c) (+-inverseˡ b) ⟩
-  (a + (- b + b)) - c       ≡˘⟨ cong (_- c) (+-assoc a (- b) b) ⟩
-  ((a - b) + b) - c         ≡⟨ +-assoc (a - b) b (- c) ⟩
-  (a - b) + (b - c)         ∎
+  a - c                 ≡˘⟨ cong (_- c) (+-identityʳ a) ⟩
+  (a + 0ℚ) - c          ≡˘⟨ cong (λ z → (a + z) - c) (+-inverseˡ b) ⟩
+  (a + (- b + b)) - c   ≡˘⟨ cong (_- c) (+-assoc a (- b) b) ⟩
+  ((a - b) + b) - c     ≡⟨ +-assoc (a - b) b (- c) ⟩
+  (a - b) + (b - c)     ∎
+
+triangle-inequality :
+  (a b c : ℚ) →
+  ∣ a - c ∣ ≤ ∣ a - b ∣ + ∣ b - c ∣
+triangle-inequality a b c =
+  begin
+  ∣ a - c ∣               ≡⟨ cong ∣_∣ (insert-lemma a b c) ⟩
+  ∣ (a - b) + (b - c) ∣   ≤⟨ ∣p+q∣≤∣p∣+∣q∣ (a - b) (b - c) ⟩
+  ∣ a - b ∣ + ∣ b - c ∣   ∎
