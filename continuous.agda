@@ -190,66 +190,60 @@ module IVT
       fc≤0 : capp f (fromℚ c) ℝ.≤ 0ℝ
       0≤fd : 0ℝ ℝ.≤ capp f (fromℚ d)
 
-  record compatible (c d c' d' : ℚ) : Set where
-    constructor mkCompat
-    field
-      c-mono : c ℚ.≤ c'
-      d-mono : d' ℚ.≤ d
-      d-c : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
+  module Step
+    (c d : ℚ)
+    ((mkCorrect c<d fc≤0 0≤fd) : correct c d)
+    where
 
-  record corr-comp (c d c' d' : ℚ) : Set where
-    field
-      corr : correct c' d'
-      comp : compatible c d c' d'
+    record conclusion : Set where
+      field
+        c' : ℚ
+        d' : ℚ
+        corr : correct c' d'
+        c-mono : c ℚ.≤ c'
+        d-mono : d' ℚ.≤ d
+        d-c : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
 
-  IVTAux :
-    (c d : ℚ) →
-    (correct c d) →
-    Σ (ℚ × ℚ) (λ (c' , d') → corr-comp c d c' d')
-  IVTAux c d  (mkCorrect c<d fc≤0 0≤fd) =
-    case split of λ
-    { (inj₁ 0≤fd₀) →
-          (c , d₀)
-        , record
-          { corr = record
+    open ConvexCombination c d c<d
+
+    c₀ = convex-comb 1/3
+    d₀ = convex-comb 2/3
+
+    c₀<d₀ : c₀ ℚ.< d₀
+    c₀<d₀ = convex-comb-mono 1/3 2/3 (from-yes (1/3 ℚ.<? 2/3))
+    c<d₀ : c ℚ.< d₀
+    c<d₀ = convex-comb-mono-0 2/3 (from-yes (0ℚ ℚ.<? 2/3))
+    c₀<d : c₀ ℚ.< d
+    c₀<d = convex-comb-mono-1 1/3 (from-yes (1/3 ℚ.<? 1ℚ))
+    d₀<d : d₀ ℚ.< d
+    d₀<d = convex-comb-mono-1 2/3 (from-yes (2/3 ℚ.<? 1ℚ))
+
+    split : 0ℝ ℝ.≤ capp f (fromℚ d₀) ⊎ capp f (fromℚ c₀) ℝ.≤ 0ℝ
+    split = approxSplit
+              (capp f (fromℚ c₀))
+              (capp f (fromℚ d₀))
+              0ℝ
+              (f-inc (fromℚ c₀) (fromℚ d₀) (fromℚ-preserves-< c₀ d₀ c₀<d₀))
+
+    IVTAux : conclusion
+    IVTAux =
+      case split of λ
+      { (inj₁ 0≤fd₀) →
+          record
+          { c' = c
+          ; d' = d₀
+          ; corr = record
             { c<d = c<d₀
             ; fc≤0 = fc≤0
             ; 0≤fd = 0≤fd₀
             }
-          ; comp = record
-            { c-mono = ℚ.≤-refl
-            ; d-mono = ℚ.<⇒≤ d₀<d
-            ; d-c = convex-comb-diff-0 2/3
-            }
+          ; c-mono = ℚ.≤-refl
+          ; d-mono = ℚ.<⇒≤ d₀<d
+          ; d-c = convex-comb-diff-0 2/3
           }
-        {-
-        -}
-    ; (inj₂ fc₀≤0) → {!!}
-    }
-    where
-        open ConvexCombination c d c<d
-        c₀ = convex-comb 1/3
-        d₀ = convex-comb 2/3
-        c₀<d₀ : c₀ ℚ.< d₀
-        c₀<d₀ = convex-comb-mono 1/3 2/3 (from-yes (1/3 ℚ.<? 2/3))
-        split : 0ℝ ℝ.≤ capp f (fromℚ d₀) ⊎ capp f (fromℚ c₀) ℝ.≤ 0ℝ
-        split = approxSplit
-                  (capp f (fromℚ c₀))
-                  (capp f (fromℚ d₀))
-                  0ℝ
-                  (f-inc (fromℚ c₀) (fromℚ d₀) (fromℚ-preserves-< c₀ d₀ c₀<d₀))
-        c<d₀ : c ℚ.< d₀
-        c<d₀ = convex-comb-mono-0 2/3 (from-yes (0ℚ ℚ.<? 2/3))
-        c₀<d : c₀ ℚ.< d
-        c₀<d = convex-comb-mono-1 1/3 (from-yes (1/3 ℚ.<? 1ℚ))
-        d₀<d : d₀ ℚ.< d
-        d₀<d = convex-comb-mono-1 2/3 (from-yes (2/3 ℚ.<? 1ℚ))
-        correct-left : 0ℝ ℝ.≤ capp f (fromℚ d₀) → correct c d₀
-        correct-left 0≤fd₀ = mkCorrect c<d₀ fc≤0 0≤fd₀
-        compatible-left : 0ℝ ℝ.≤ capp f (fromℚ d₀) → compatible c d c d₀
-        compatible-left 0≤df₀ = mkCompat ℚ.≤-refl (ℚ.<⇒≤ d₀<d) (convex-comb-diff-0 2/3)
+      ; (inj₂ fc₀≤0) → {!!}
+      }
 
-{-
   module Iteration
     (a b : ℚ)
     (ab-correct : correct a b)
@@ -345,4 +339,3 @@ module IVT
     IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
     IVT = {!!}
 
--}
