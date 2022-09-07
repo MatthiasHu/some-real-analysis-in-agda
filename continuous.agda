@@ -176,16 +176,19 @@ module ConvexCombination
     convex-comb t ℚ.- c ≡ t ℚ.* (d - c)
   convex-comb-diff-0 t =
     begin-equality
-    (c + t * (d - c) - c)    ≡⟨ cong (_- c) (ℚ.+-comm c (t * (d - c))) ⟩
-    (t * (d - c) + c - c)    ≡⟨ ℚ.+-assoc (t * (d - c)) c (- c) ⟩
-    (t * (d - c) + (c - c))  ≡⟨ cong (t * (d - c) +_) (ℚ.+-inverseʳ c) ⟩
-    (t * (d - c) + 0ℚ)       ≡⟨ ℚ.+-identityʳ (t * (d - c)) ⟩
-    (t * (d - c))            ∎
+    (convex-comb t - c)               ≡˘⟨ cong (λ z → convex-comb t - z) convex-comb-0 ⟩
+    (convex-comb t - convex-comb 0ℚ)  ≡⟨ convex-comb-diff t 0ℚ ⟩
+    ((t + 0ℚ) * (d - c))              ≡⟨ cong (_* (d - c)) (ℚ.+-identityʳ t) ⟩
+    (t * (d - c))                     ∎
 
   convex-comb-diff-1 :
     (t : ℚ) →
     d ℚ.- convex-comb t ≡ (1ℚ ℚ.- t) ℚ.* (d - c)
-  convex-comb-diff-1 = {!!}
+  convex-comb-diff-1 t =
+    begin-equality
+    (d - convex-comb t)               ≡˘⟨ cong (_- convex-comb t) convex-comb-1 ⟩
+    (convex-comb 1ℚ - convex-comb t)  ≡⟨ convex-comb-diff 1ℚ t ⟩
+    ((1ℚ - t) * (d - c))              ∎
 
 module IVT
   (f : cont)
