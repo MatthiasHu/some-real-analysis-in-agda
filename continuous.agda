@@ -42,18 +42,6 @@ record cont : Set where
 
 --- application of a continuous function to a real number ---
 
-insert-lemma : (a b c : ℚ) → a ℚ.- c ≡ (a ℚ.- b) ℚ.+ (b ℚ.- c)
-insert-lemma a b c =
-  begin-equality
-  a - c                     ≡˘⟨ cong (_- c) (ℚ.+-identityʳ a) ⟩
-  (a + 0ℚ) - c              ≡˘⟨ cong (λ z → (a + z) - c) (ℚ.+-inverseˡ b) ⟩
-  (a + (- b + b)) - c       ≡˘⟨ cong (_- c) (ℚ.+-assoc a (- b) b) ⟩
-  ((a - b) + b) - c         ≡⟨ ℚ.+-assoc (a - b) b (- c) ⟩
-  (a - b) + (b - c)         ∎
-  where
-  open ℚ.≤-Reasoning
-  open import Data.Rational -- for unqualified _+_ and _-_
-
 capp : cont → ℝ → ℝ
 ℝ.as (capp f (ℝ.realConstr as M cauchy-as)) n = cont.h f (as n) n 
 ℝ.M (capp f (ℝ.realConstr as M cauchy-as)) p = cont.α f (suc p) ℕ.⊔ M (cont.ω f (suc p))

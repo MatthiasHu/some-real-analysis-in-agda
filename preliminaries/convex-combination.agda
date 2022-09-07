@@ -72,7 +72,7 @@ module ConvexCombination
     convex-comb t' - convex-comb t ≡ (t' - t) * (d - c)
   convex-comb-diff t' t =
     begin-equality
-    (c + t' *d-c) - (c + t *d-c)     ≡⟨ differenceOfSums c (t' *d-c) c (t *d-c) ⟩
+    (c + t' *d-c) - (c + t *d-c)     ≡⟨ difference-of-sums c (t' *d-c) c (t *d-c) ⟩
     ((c - c) + (t' *d-c - t *d-c) )  ≡⟨ cong (_+ (t' *d-c - t *d-c)) (+-inverseʳ c) ⟩
     (0ℚ + (t' *d-c - t *d-c) )       ≡⟨ cong (0ℚ +_) (cong (t' *d-c +_) (neg-distribˡ-* t (d - c))) ⟩
     0ℚ + (t' *d-c + (- t) *d-c)      ≡˘⟨ cong (0ℚ +_) ( *-distribʳ-+ (d - c) t' (- t)) ⟩

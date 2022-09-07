@@ -94,7 +94,7 @@ _+_ : ℝ → ℝ → ℝ
 ℝ.M (realConstr as M cauchy-as + realConstr bs N cauchy-bs) p = (M (suc p) ℕ.⊔ N (suc p))
 ℝ.cauchy (realConstr as M cauchy-as + realConstr bs N cauchy-bs) p n m n≥ m≥ =
   begin
-  ℚ.∣ (as n ℚ.+ bs n) ℚ.- (as m ℚ.+ bs m) ∣        ≡⟨ cong ℚ.∣_∣ (differenceOfSums (as n) (bs n) (as m) (bs m)) ⟩
+  ℚ.∣ (as n ℚ.+ bs n) ℚ.- (as m ℚ.+ bs m) ∣        ≡⟨ cong ℚ.∣_∣ (difference-of-sums (as n) (bs n) (as m) (bs m)) ⟩
   ℚ.∣ (as n ℚ.- as m) ℚ.+ (bs n ℚ.- bs m) ∣        ≤⟨ ℚ.∣p+q∣≤∣p∣+∣q∣ (as n ℚ.- as m) (bs n ℚ.- bs m) ⟩
   ℚ.∣ (as n ℚ.- as m) ∣ ℚ.+ ℚ.∣ (bs n ℚ.- bs m) ∣  ≤⟨ ℚ.+-mono-≤ (cauchy-as (suc p) n m (⊔-left n≥) (⊔-left m≥))
                                                                  (cauchy-bs (suc p) n m (⊔-right n≥) (⊔-right m≥)) ⟩
