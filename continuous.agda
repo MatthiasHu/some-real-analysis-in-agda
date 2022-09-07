@@ -218,8 +218,8 @@ module IVT
       helper zero = ℚ.≤-refl
       helper (suc diff) =
         begin
-        cs k             ≤⟨ helper diff ⟩
-        cs (diff ℕ.+ k)     ≤⟨ cs-mono-suc (diff ℕ.+ k) ⟩
+        cs k                 ≤⟨ helper diff ⟩
+        cs (diff ℕ.+ k)      ≤⟨ cs-mono-suc (diff ℕ.+ k) ⟩
         cs (suc diff ℕ.+ k)  ∎
 
     ds-mono : (k n : ℕ) → (k ℕ.≤ n) → (ds n ℚ.≤ ds k)
@@ -229,7 +229,7 @@ module IVT
       helper zero = ℚ.≤-refl
       helper (suc diff) =
         begin
-        ds (suc diff ℕ.+ k)    ≤⟨ ds-mono-suc (diff ℕ.+ k) ⟩
+        ds (suc diff ℕ.+ k)   ≤⟨ ds-mono-suc (diff ℕ.+ k) ⟩
         ds (diff ℕ.+ k)       ≤⟨  helper diff  ⟩
         ds k                  ∎
 
