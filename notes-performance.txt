@@ -1,0 +1,12 @@
+What might prevent hanging?
+
+- mkCorrect  -- no
+- hole as definition  -- yes
+- explicit t t'  -- no
+- convex-comb-mono-0  -- no
+- where instead of let  -- no
+- without compatibility  -- yes!!!
+- mkCorrect and mkCompat  -- no
+- unfolded compatible  -- no
+- recursion operator  -- no
+- type signature for split
