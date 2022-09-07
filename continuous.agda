@@ -202,7 +202,7 @@ module IVT
         c₀ = convex-comb 1/3
         d₀ = convex-comb 2/3
         c₀<d₀ : c₀ ℚ.< d₀
-        c₀<d₀ = convex-comb-mono 1/3 2/3 ((from-yes (1/3 ℚ.<? 2/3)))
+        c₀<d₀ = convex-comb-mono 1/3 2/3 (from-yes (1/3 ℚ.<? 2/3))
         split : 0ℝ ℝ.≤ capp f (fromℚ d₀) ⊎ capp f (fromℚ c₀) ℝ.≤ 0ℝ
         split = approxSplit
                   (capp f (fromℚ c₀))

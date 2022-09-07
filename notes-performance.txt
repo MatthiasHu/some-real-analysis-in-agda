@@ -16,6 +16,6 @@ What might prevent hanging?
 - compatible and correct as functions  -- no
 - both functions defined by a hole  -- no!
 - filled in compatible
-- no unsolved metas in import
-- unspecified result type
+- no unsolved metas in import  -- no
+- unspecified result type  -- no
 - no use of from-yes
