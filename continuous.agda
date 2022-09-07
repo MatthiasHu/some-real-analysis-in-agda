@@ -2,7 +2,6 @@ module continuous where
 
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 import Data.Nat.Properties as ℕ
-open import Data.Integer as ℤ using ()
 open import Data.Rational as ℚ using (ℚ; ½; 0ℚ; 1ℚ)
 import Data.Rational.Properties as ℚ
 open import Data.Product
@@ -16,13 +15,11 @@ open import Function.Base using (case_of_)
 open import Algebra.Bundles using (module Ring)
 open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
-open import real as ℝ using (ℝ; Cauchy; ½^sucp+½^sucp≡½^p; 0ℝ; _≃_; fromℚ; approxSplit; fromℚ-preserves-<)
+open import real as ℝ using (ℝ; Cauchy; 0ℝ; _≃_; fromℚ; approxSplit; fromℚ-preserves-<)
 
+open import preliminaries.on-rationals
+open import preliminaries.convex-combination
 
-
-
-archimedian : (a : ℚ) → Σ ℕ (λ p → (ℤ.+ 2 ℚ./ 1) ^ p ℚ.> a)
-archimedian = {!!}
 
 
 --- definition of continuous functions ---
@@ -93,102 +90,6 @@ strictly-increasing f = (x y : ℝ) → x ℝ.< y → capp f x ℝ.< capp f y
   
 
 --- intermediate value theorem ---
-
-1/3 = ℤ.+ 1 ℚ./ 3
-2/3 = ℤ.+ 2 ℚ./ 3
-
-module ConvexCombination
-  (c d : ℚ)
-  (c<d : c ℚ.< d)
-  where
-
-  open import Data.Rational
-  open ℚ.≤-Reasoning
-
-  convex-comb : ℚ → ℚ
-  convex-comb t = c + t * (d - c)
-
-  convex-comb-0 : convex-comb 0ℚ ≡ c
-  convex-comb-0 =
-    begin-equality
-    c + 0ℚ * (d - c)   ≡⟨ cong (c +_) (ℚ.*-zeroˡ (d - c)) ⟩
-    c + 0ℚ             ≡⟨ ℚ.+-identityʳ c ⟩
-    c                  ∎
-
-  convex-comb-1 : convex-comb 1ℚ ≡ d
-  convex-comb-1 =
-    begin-equality
-    c + 1ℚ * (d - c)  ≡⟨ cong (c +_) (ℚ.*-identityˡ (d - c)) ⟩
-    c + (d - c)       ≡⟨ cong (c +_) (ℚ.+-comm d (- c)) ⟩
-    c + ((- c) + d)   ≡˘⟨ ℚ.+-assoc c (- c) d ⟩
-    (c - c) + d       ≡⟨ cong (_+ d) (ℚ.+-inverseʳ c) ⟩
-    0ℚ + d            ≡⟨ ℚ.+-identityˡ d  ⟩
-    d                 ∎
-
-  d-c-Positive : Positive (d - c)
-  d-c-Positive = positive
-    (begin-strict
-    0ℚ       ≡˘⟨ ℚ.+-inverseʳ c ⟩
-    c - c    <⟨ ℚ.+-monoˡ-< (- c) c<d ⟩
-    d - c    ∎)
-
-  convex-comb-mono :
-    (t t' : ℚ) →
-    t ℚ.< t' →
-    convex-comb t ℚ.< convex-comb t'
-  convex-comb-mono t t' t<t' = ℚ.+-monoʳ-< c
-    (begin-strict
-    t * (d - c)    <⟨ ℚ.*-monoˡ-<-pos (d - c) d-c-Positive t<t' ⟩
-    t' * (d - c)   ∎
-    )
-
-  convex-comb-mono-0 : (t : ℚ) → (0ℚ ℚ.< t) → c ℚ.< convex-comb t
-  convex-comb-mono-0 t 0<t =
-    begin-strict
-    c               ≡˘⟨ convex-comb-0 ⟩
-    convex-comb 0ℚ  <⟨ convex-comb-mono 0ℚ t 0<t  ⟩
-    convex-comb t   ∎
-
-  convex-comb-mono-1 : (t : ℚ) → (t ℚ.< 1ℚ) → convex-comb t ℚ.< d
-  convex-comb-mono-1 t t<1 =
-    begin-strict
-    convex-comb t   <⟨ convex-comb-mono t 1ℚ t<1  ⟩
-    convex-comb 1ℚ  ≡⟨ convex-comb-1 ⟩
-    d
-    ∎
-
-  convex-comb-diff :
-    (t' t : ℚ) →
-    convex-comb t' ℚ.- convex-comb t ≡ (t' - t) ℚ.* (d - c)
-  convex-comb-diff t' t =
-    begin-equality
-    (c + t' *d-c) - (c + t *d-c)     ≡⟨ ℝ.differenceOfSums c (t' *d-c) c (t *d-c) ⟩
-    ((c - c) + (t' *d-c - t *d-c) )  ≡⟨ cong (_+ (t' *d-c - t *d-c)) (ℚ.+-inverseʳ c) ⟩
-    (0ℚ + (t' *d-c - t *d-c) )       ≡⟨ cong (0ℚ +_) (cong (t' *d-c +_) (ℚ.neg-distribˡ-* t (d - c))) ⟩
-    0ℚ + (t' *d-c + (- t) *d-c)      ≡˘⟨ cong (0ℚ +_) ( ℚ.*-distribʳ-+ (d - c) t' (- t)) ⟩
-    0ℚ + (t' - t) *d-c               ≡⟨ ℚ.+-identityˡ ((t' - t) * (d - c)) ⟩
-    (t' - t) *d-c                    ∎
-    where
-    _*d-c = _* (d - c)
-
-  convex-comb-diff-0 :
-    (t : ℚ) →
-    convex-comb t ℚ.- c ≡ t ℚ.* (d - c)
-  convex-comb-diff-0 t =
-    begin-equality
-    (convex-comb t - c)               ≡˘⟨ cong (λ z → convex-comb t - z) convex-comb-0 ⟩
-    (convex-comb t - convex-comb 0ℚ)  ≡⟨ convex-comb-diff t 0ℚ ⟩
-    ((t + 0ℚ) * (d - c))              ≡⟨ cong (_* (d - c)) (ℚ.+-identityʳ t) ⟩
-    (t * (d - c))                     ∎
-
-  convex-comb-diff-1 :
-    (t : ℚ) →
-    d ℚ.- convex-comb t ≡ (1ℚ ℚ.- t) ℚ.* (d - c)
-  convex-comb-diff-1 t =
-    begin-equality
-    (d - convex-comb t)               ≡˘⟨ cong (_- convex-comb t) convex-comb-1 ⟩
-    (convex-comb 1ℚ - convex-comb t)  ≡⟨ convex-comb-diff 1ℚ t ⟩
-    ((1ℚ - t) * (d - c))              ∎
 
 module IVT
   (f : cont)
@@ -367,9 +268,8 @@ module IVT
 
     x : ℝ
     ℝ.as x = cs
-    ℝ.M x p0 = {!2 ℕ.* p0!}
+    ℝ.M x p0 = 2 ℕ.* p0
     ℝ.cauchy x = {!!}
 
     IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
-    IVT = {!!}
-
+    IVT = x , {!!}

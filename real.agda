@@ -19,55 +19,7 @@ open import Relation.Nullary
 open import Algebra.Bundles using (module Ring)
 open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
-open import Agda.Builtin.Unit using (tt)
-
-
---- preliminaries on small rational numbers ---
-
-Positive-½ : ℚ.Positive ½
-Positive-½ = tt
-
-0ℚ<½^p : (p : ℕ) → 0ℚ ℚ.< ½ ^ p
-0ℚ<½^p ℕ.zero = ℚ.positive⁻¹ tt
-0ℚ<½^p (suc p) = begin-strict
-  0ℚ             ≡⟨⟩
-  ½ ℚ.* 0ℚ       <⟨ ℚ.*-monoʳ-<-pos ½ Positive-½ (0ℚ<½^p p) ⟩
-  ½ ℚ.* (½ ^ p)  ∎
-  where
-  open ℚ.≤-Reasoning
-
-½^sucp+½^sucp≡½^p : (p : ℕ) → ½ ^ (suc p) ℚ.+ ½ ^ (suc p) ≡ ½ ^ p
-½^sucp+½^sucp≡½^p zero = refl
-½^sucp+½^sucp≡½^p (suc p) =
-  begin
-  ½ ^ suc (suc p) ℚ.+ ½ ^ suc (suc p)  ≡⟨⟩
-  ½ ℚ.* ½ ^ suc p ℚ.+ ½ ℚ.* ½ ^ suc p  ≡˘⟨ ℚ.*-distribˡ-+ ½ (½ ^ suc p) (½ ^ suc p) ⟩
-  ½ ℚ.* (½ ^ suc p ℚ.+ ½ ^ suc p)      ≡⟨ cong (½ ℚ.*_) (½^sucp+½^sucp≡½^p p) ⟩
-  ½ ^ suc p                            ∎
-  where
-  open ≡-Reasoning
-
-archimedian-ε : (a : ℚ) → ℚ.Positive a → Σ ℕ (λ p → ½ ^ p ℚ.< a)
-archimedian-ε = {!!}
-
-
---- preliminaries on triangle inequality for rational numbers ---
-
-differenceOfSums :
-  (a b a' b' : ℚ) →
-  (a ℚ.+ b) ℚ.- (a' ℚ.+ b') ≡ (a ℚ.- a') ℚ.+ (b ℚ.- b')
-differenceOfSums a b a' b' =
-  begin-equality
-  (a + b) - (a' + b')     ≡⟨ cong ((a + b) ℚ.+_) (ℚ.neg-distrib-+ a' b') ⟩
-  (a + b) + (- a' - b')   ≡˘⟨ ℚ.+-assoc (a + b) (- a') (- b') ⟩
-  ((a + b) + - a') - b'   ≡⟨ cong (_- b') (ℚ.+-assoc a b (- a')) ⟩
-  (a + (b - a')) - b'     ≡⟨ cong (λ x → (a + x) - b') (ℚ.+-comm b (- a')) ⟩
-  (a + (- a' + b)) - b'   ≡˘⟨ cong (_- b') (ℚ.+-assoc a (- a') b) ⟩
-  ((a - a') + b) - b'     ≡⟨ ℚ.+-assoc (a - a') b (- b') ⟩
-  (a - a') + (b - b')     ∎
-  where
-  open ℚ.≤-Reasoning
-  open import Data.Rational
+open import preliminaries.on-rationals
 
 
 --- Cauchy sequence property ---
