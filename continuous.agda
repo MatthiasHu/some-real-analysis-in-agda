@@ -128,14 +128,22 @@ module ConvexCombination
     d - c    ∎)
 
   convex-comb-mono :
-    {t t' : ℚ} →
+    (t t' : ℚ) →
     t ℚ.< t' →
     convex-comb t ℚ.< convex-comb t'
-  convex-comb-mono {t} {t'} t<t' = ℚ.+-monoʳ-< c
+  convex-comb-mono t t' t<t' = ℚ.+-monoʳ-< c
     (begin-strict
     t * (d - c)    <⟨ ℚ.*-monoˡ-<-pos (d - c) d-c-Positive t<t' ⟩
     t' * (d - c)   ∎
     )
+
+  convex-comb-mono-0 : (t : ℚ) → (0ℚ ℚ.< t) → c ℚ.< convex-comb t
+  convex-comb-mono-0 t 0<t =
+    begin-strict
+    c               ≡˘⟨ convex-comb-0 ⟩
+    convex-comb 0ℚ  <⟨ convex-comb-mono 0ℚ t 0<t  ⟩
+    convex-comb t   ∎
+
 
 module IVT
   (f : cont)
@@ -150,6 +158,7 @@ module IVT
       0≤fd : 0ℝ ℝ.≤ capp f (fromℚ d)
 
   record compatible (c d c' d' : ℚ) : Set where
+    constructor mkCompat
     field
       c-mono : c ℚ.≤ c'
       d-mono : d' ℚ.≤ d
@@ -160,11 +169,43 @@ module IVT
     (correct c d) →
     Σ (ℚ × ℚ) (λ (c' , d') → correct c' d' × compatible c d c' d')
   IVTAux c d  (mkCorrect c<d fc≤0 0≤fd) =
-    let open ConvexCombination c d c<d
+    case split of λ
+      { (inj₁ 0≤fd₀) →
+          (c , d₀)
+        , ( record
+            { c<d =  c<d₀ 
+            ; fc≤0 =  fc≤0 
+            ; 0≤fd = 0≤fd₀
+            }
+          , {!record
+            { c-mono = {! ℚ.≤-refl !}
+            ; d-mono = {!!}
+            ; d-c = {!!}
+            }  !}
+          )
+    ; (inj₂ fc₀≤0) →
+        (c₀ , d)
+      , ( record
+          { c<d = {! c₀<d !}
+          ; fc≤0 = fc₀≤0
+          ; 0≤fd = 0≤fd
+          }
+        , {!!}
+        {-
+        , record
+          { c-mono = {!!}
+          ; d-mono = ℚ.≤-refl
+          ; d-c = {!!}
+          }
+        -}
+        )
+      }
+    where
+        open ConvexCombination c d c<d
         c₀ = convex-comb 1/3
         d₀ = convex-comb 2/3
         c₀<d₀ : c₀ ℚ.< d₀
-        c₀<d₀ = convex-comb-mono ((from-yes (1/3 ℚ.<? 2/3)))
+        c₀<d₀ = convex-comb-mono 1/3 2/3 ((from-yes (1/3 ℚ.<? 2/3)))
         split = approxSplit
                   (capp f (fromℚ c₀))
                   (capp f (fromℚ d₀))
@@ -172,44 +213,12 @@ module IVT
                   (f-inc (fromℚ c₀) (fromℚ d₀) (fromℚ-preserves-< c₀ d₀ c₀<d₀))
         open ℚ.≤-Reasoning
         c<d₀ : c ℚ.< d₀
-        c<d₀ = begin-strict
-                 c               ≡˘⟨ convex-comb-0 ⟩
-                 convex-comb 0ℚ  <⟨ convex-comb-mono ((from-yes (0ℚ ℚ.<? 2/3))) ⟩
-                 d₀              ∎
+        c<d₀ = convex-comb-mono-0 2/3 (from-yes (0ℚ ℚ.<? 2/3))
         c₀<d : c₀ ℚ.< d
         c₀<d = begin-strict
-                 c₀              <⟨ convex-comb-mono ((from-yes (1/3 ℚ.<? 1ℚ))) ⟩
+                 c₀              <⟨ convex-comb-mono 1/3 1ℚ ((from-yes (1/3 ℚ.<? 1ℚ))) ⟩
                  convex-comb 1ℚ  ≡⟨ convex-comb-1 ⟩
                  d               ∎
-    in
-    case split of λ
-      { (inj₁ 0≤fd₀) →
-          (c , d₀)
-        , ( record
-            { c<d = {!c<d₀!}
-            ; fc≤0 = fc≤0
-            ; 0≤fd = 0≤fd₀
-            }
-          , record
-            { c-mono = ℚ.≤-refl
-            ; d-mono = {!!}
-            ; d-c = {!!}
-            }
-          )
-    ; (inj₂ fc₀≤0) →
-        (c₀ , d)
-      , ( record
-          { c<d = c₀<d
-          ; fc≤0 = fc₀≤0
-          ; 0≤fd = 0≤fd
-          }
-        , record
-          { c-mono = {!!}
-          ; d-mono = ℚ.≤-refl
-          ; d-c = {!!}
-          }
-        )
-      }
 
 {-
   IVT :
