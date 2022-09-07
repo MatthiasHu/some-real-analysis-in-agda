@@ -158,9 +158,18 @@ module ConvexCombination
     ∎
 
   convex-comb-diff :
-    (t t' : ℚ) →
+    (t' t : ℚ) →
     convex-comb t' ℚ.- convex-comb t ≡ (t' - t) ℚ.* (d - c)
-  convex-comb-diff = {!!}
+  convex-comb-diff t' t =
+    begin-equality
+    (c + t' *d-c) - (c + t *d-c)     ≡⟨ ℝ.differenceOfSums c (t' *d-c) c (t *d-c) ⟩
+    ((c - c) + (t' *d-c - t *d-c) )  ≡⟨ cong (_+ (t' *d-c - t *d-c)) (ℚ.+-inverseʳ c) ⟩
+    (0ℚ + (t' *d-c - t *d-c) )       ≡⟨ cong (0ℚ +_) (cong (t' *d-c +_) (ℚ.neg-distribˡ-* t (d - c))) ⟩
+    0ℚ + (t' *d-c + (- t) *d-c)      ≡˘⟨ cong (0ℚ +_) ( ℚ.*-distribʳ-+ (d - c) t' (- t)) ⟩
+    0ℚ + (t' - t) *d-c               ≡⟨ ℚ.+-identityˡ ((t' - t) * (d - c)) ⟩
+    (t' - t) *d-c                    ∎
+    where
+    _*d-c = _* (d - c)
 
   convex-comb-diff-0 :
     (t : ℚ) →

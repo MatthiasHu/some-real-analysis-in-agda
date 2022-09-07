@@ -51,6 +51,25 @@ archimedian-ε : (a : ℚ) → ℚ.Positive a → Σ ℕ (λ p → ½ ^ p ℚ.< 
 archimedian-ε = {!!}
 
 
+--- preliminaries on triangle inequality for rational numbers ---
+
+differenceOfSums :
+  (a b a' b' : ℚ) →
+  (a ℚ.+ b) ℚ.- (a' ℚ.+ b') ≡ (a ℚ.- a') ℚ.+ (b ℚ.- b')
+differenceOfSums a b a' b' =
+  begin-equality
+  (a + b) - (a' + b')     ≡⟨ cong ((a + b) ℚ.+_) (ℚ.neg-distrib-+ a' b') ⟩
+  (a + b) + (- a' - b')   ≡˘⟨ ℚ.+-assoc (a + b) (- a') (- b') ⟩
+  ((a + b) + - a') - b'   ≡⟨ cong (_- b') (ℚ.+-assoc a b (- a')) ⟩
+  (a + (b - a')) - b'     ≡⟨ cong (λ x → (a + x) - b') (ℚ.+-comm b (- a')) ⟩
+  (a + (- a' + b)) - b'   ≡˘⟨ cong (_- b') (ℚ.+-assoc a (- a') b) ⟩
+  ((a - a') + b) - b'     ≡⟨ ℚ.+-assoc (a - a') b (- b') ⟩
+  (a - a') + (b - b')     ∎
+  where
+  open ℚ.≤-Reasoning
+  open import Data.Rational
+
+
 --- Cauchy sequence property ---
 
 Cauchy : (ℕ → ℚ) → (ℕ → ℕ) → Set
@@ -117,23 +136,6 @@ pos (realConstr as M cauchy) = Σ ℕ (λ p → ½ ^ p ℚ.≤ as (M (suc p)))
 
 
 --- arithmetic operations ---
-
-private
-  differenceOfSums :
-    (a b a' b' : ℚ) →
-    (a ℚ.+ b) ℚ.- (a' ℚ.+ b') ≡ (a ℚ.- a') ℚ.+ (b ℚ.- b')
-  differenceOfSums a b a' b' =
-    begin-equality
-    (a + b) - (a' + b')     ≡⟨ cong ((a + b) ℚ.+_) (ℚ.neg-distrib-+ a' b') ⟩
-    (a + b) + (- a' - b')   ≡˘⟨ ℚ.+-assoc (a + b) (- a') (- b') ⟩
-    ((a + b) + - a') - b'   ≡⟨ cong (_- b') (ℚ.+-assoc a b (- a')) ⟩
-    (a + (b - a')) - b'     ≡⟨ cong (λ x → (a + x) - b') (ℚ.+-comm b (- a')) ⟩
-    (a + (- a' + b)) - b'   ≡˘⟨ cong (_- b') (ℚ.+-assoc a (- a') b) ⟩
-    ((a - a') + b) - b'     ≡⟨ ℚ.+-assoc (a - a') b (- b') ⟩
-    (a - a') + (b - b')     ∎
-    where
-    open ℚ.≤-Reasoning
-    open import Data.Rational
 
 _+_ : ℝ → ℝ → ℝ
 ℝ.as (realConstr as M cauchy-as + realConstr bs N cauchy-bs) n = as n ℚ.+ bs n
