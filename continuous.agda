@@ -20,6 +20,12 @@ open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 open import real as ℝ using (ℝ; Cauchy; ½^sucp+½^sucp≡½^p; 0ℝ; _≃_; fromℚ; approxSplit; fromℚ-preserves-<)
 
 
+
+
+archimedian : (a : ℚ) → Σ ℕ (λ p → (ℤ.+ 2 ℚ./ 1) ^ p ℚ.> a)
+archimedian = {!!}
+
+
 --- definition of continuous functions ---
 
 -- continuous functions represented by approximations of their values on the rationals
@@ -167,21 +173,17 @@ module IVT
   IVTAux :
     (c d : ℚ) →
     (correct c d) →
-    Σ (ℚ × ℚ) (λ (c' , d') → correct c' d' × compatible c d c' d')
+    Σ (ℚ × ℚ) (λ (c' , d') → correct c' d' × c ℚ.≤ c' × d' ℚ.≤ d × (d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)))
   IVTAux c d  (mkCorrect c<d fc≤0 0≤fd) =
     case split of λ
       { (inj₁ 0≤fd₀) →
           (c , d₀)
         , ( record
-            { c<d =  c<d₀ 
+            { c<d = {! c<d₀ !}
             ; fc≤0 =  fc≤0 
             ; 0≤fd = 0≤fd₀
             }
-          , {!record
-            { c-mono = {! ℚ.≤-refl !}
-            ; d-mono = {!!}
-            ; d-c = {!!}
-            }  !}
+          , {!!}
           )
     ; (inj₂ fc₀≤0) →
         (c₀ , d)
@@ -191,13 +193,6 @@ module IVT
           ; 0≤fd = 0≤fd
           }
         , {!!}
-        {-
-        , record
-          { c-mono = {!!}
-          ; d-mono = ℚ.≤-refl
-          ; d-c = {!!}
-          }
-        -}
         )
       }
     where
@@ -220,9 +215,98 @@ module IVT
                  convex-comb 1ℚ  ≡⟨ convex-comb-1 ⟩
                  d               ∎
 
-{-
-  IVT :
-    RecData →
-    Σ ℝ (λ z → capp f z ≃ 0ℝ)
-  IVT = {!!}
--}
+  module _
+    (a b : ℚ)
+    (ab-correct : correct a b)
+    (b-a≤1 : b ℚ.- a ℚ.≤ 1ℚ)
+    where
+    
+    open ℚ.≤-Reasoning
+        
+    cds : ℕ → ℚ × ℚ
+    cds zero = a , b
+    cds (suc n) = {!!}
+
+    cs : ℕ → ℚ
+    cs n = proj₁ (cds n)
+    ds : ℕ → ℚ
+    ds n = proj₂ (cds n)
+
+    cds-correct : (n : ℕ) → correct (cs n) (ds n)
+    cds-correct = {!!}
+
+    cs-mono-suc : (n : ℕ) → cs n ℚ.≤ cs (suc n)
+    cs-mono-suc = {!!}
+
+    ds-mono-suc : (n : ℕ) → ds (suc n) ℚ.≤ ds n
+    ds-mono-suc = {!!}
+
+    cds-dist-suc : (n : ℕ) → (ds (suc n)) ℚ.- (cs (suc n)) ≡ 2/3 ℚ.* (ds n ℚ.- cs n)
+    cds-dist-suc = {!!}
+
+    cds-dist : (k : ℕ) → ds k ℚ.- cs k ≡ (2/3 ^ k) ℚ.* (b ℚ.- a)
+    cds-dist zero =
+      begin-equality
+      ds zero ℚ.- cs zero           ≡⟨ refl ⟩
+      b ℚ.- a                       ≡˘⟨ ℚ.*-identityˡ (b ℚ.- a) ⟩
+      1ℚ ℚ.* (b ℚ.- a)              ≡⟨ refl ⟩
+      (2/3 ^ zero) ℚ.* (b ℚ.- a)    ∎
+    cds-dist (suc k) =
+      begin-equality
+      ds (suc k) ℚ.- cs (suc k)        ≡⟨ cds-dist-suc k ⟩
+      2/3 ℚ.* (ds k ℚ.- cs k)          ≡⟨ cong (2/3 ℚ.*_) (cds-dist k) ⟩
+      2/3 ℚ.* (2/3 ^ k ℚ.* (b ℚ.- a))  ≡˘⟨ ℚ.*-assoc 2/3 (2/3 ^ k) (b ℚ.- a) ⟩
+      (2/3 ℚ.* 2/3 ^ k) ℚ.* (b ℚ.- a)  ≡⟨ refl ⟩
+      2/3 ^ (suc k) ℚ.* (b ℚ.- a)      ∎
+
+    cs-mono : (k n : ℕ) → (k ℕ.≤ n) → (cs k ℚ.≤ cs n)
+    cs-mono k n k≤n = subst (λ n' → cs k ℚ.≤ cs n') (ℕ.m∸n+n≡m k≤n) (helper (n ℕ.∸ k) )
+      where
+      helper : (diff : ℕ) → cs k ℚ.≤ cs (diff ℕ.+ k)
+      helper zero = ℚ.≤-refl
+      helper (suc diff) =
+        begin
+        cs k             ≤⟨ helper diff ⟩
+        cs (diff ℕ.+ k)     ≤⟨ cs-mono-suc (diff ℕ.+ k) ⟩
+        cs (suc diff ℕ.+ k)  ∎
+
+    ds-mono : (k n : ℕ) → (k ℕ.≤ n) → (ds n ℚ.≤ ds k)
+    ds-mono k n k≤n =  subst (λ n' → ds n' ℚ.≤ ds k) (ℕ.m∸n+n≡m k≤n) (helper (n ℕ.∸ k) ) 
+      where
+      helper : (diff : ℕ) → ds (diff ℕ.+ k) ℚ.≤ ds k
+      helper zero = ℚ.≤-refl
+      helper (suc diff) =
+        begin
+        ds (suc diff ℕ.+ k)    ≤⟨ ds-mono-suc (diff ℕ.+ k) ⟩
+        ds (diff ℕ.+ k)       ≤⟨  helper diff  ⟩
+        ds k                  ∎
+
+    cs<ds : (n m : ℕ) → cs n ℚ.< ds m
+    cs<ds n m =
+      let n⊔m = n ℕ.⊔ m
+      in
+      begin-strict
+      cs n    ≤⟨ cs-mono n n⊔m (ℕ.m≤m⊔n n m) ⟩
+      cs n⊔m  <⟨ correct.c<d (cds-correct n⊔m) ⟩
+      ds n⊔m  ≤⟨ ds-mono m n⊔m (ℕ.n≤m⊔n n m) ⟩
+      ds m    ∎
+
+    cauchy-helper :
+      (k : ℕ) →
+      (n m : ℕ) →
+      (n ℕ.≥ k) → (m ℕ.≥ k) →
+      ℚ.∣ cs m ℚ.- cs n ∣ ℚ.≤ (2/3 ^ k) ℚ.* (b ℚ.- a)
+    cauchy-helper k n m n≥k m≥k =
+      begin
+      ℚ.∣ cs m ℚ.- cs n ∣                           ≡⟨ {!!} ⟩
+      ℚ.∣ cs m ℚ.- cs k ∣ ℚ.+ ℚ.∣ cs k ℚ.- cs n ∣   ≡⟨ {!!} ⟩
+      2/3 ^ k ℚ.* (b ℚ.- a)                         ∎
+
+    x : ℝ
+    ℝ.as x = cs
+    ℝ.M x p0 = {!2 ℕ.* p0!}
+    ℝ.cauchy x = {!!}
+
+    IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
+    IVT = {!!}
+
