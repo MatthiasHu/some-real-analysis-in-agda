@@ -197,26 +197,34 @@ module IVT
       d-mono : d' ℚ.≤ d
       d-c : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
 
+  record corr-comp (c d c' d' : ℚ) : Set where
+    field
+      corr : correct c' d'
+      comp : compatible c d c' d'
+
   IVTAux :
     (c d : ℚ) →
     (correct c d) →
-    Σ (ℚ × ℚ) (λ (c' , d') → correct c' d' × compatible c d c' d')
+    Σ (ℚ × ℚ) (λ (c' , d') → corr-comp c d c' d')
   IVTAux c d  (mkCorrect c<d fc≤0 0≤fd) =
     case split of λ
     { (inj₁ 0≤fd₀) →
           (c , d₀)
-        , ( correct-left 0≤fd₀
-          , {!compatible-left 0≤fd₀!}
-          )
-    ; (inj₂ fc₀≤0) →
-          (c₀ , d)
-        , ( record
-            { c<d = {!c₀<d!}
-            ; fc≤0 = fc₀≤0
-            ; 0≤fd = 0≤fd
+        , record
+          { corr = record
+            { c<d = c<d₀
+            ; fc≤0 = fc≤0
+            ; 0≤fd = 0≤fd₀
             }
-          , {!!}
-          )
+          ; comp = record
+            { c-mono = ℚ.≤-refl
+            ; d-mono = ℚ.<⇒≤ d₀<d
+            ; d-c = convex-comb-diff-0 2/3
+            }
+          }
+        {-
+        -}
+    ; (inj₂ fc₀≤0) → {!!}
     }
     where
         open ConvexCombination c d c<d

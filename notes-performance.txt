@@ -19,5 +19,5 @@ What might prevent hanging?
 - no unsolved metas in import  -- no
 - unspecified result type  -- no
 - no use of from-yes  -- no
-- flat corr-comp record
-- first construction then properties
+- flat corr-comp record  -- yes!
+- corr-comp pair record  -- yes
