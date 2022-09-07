@@ -152,10 +152,31 @@ module ConvexCombination
   convex-comb-mono-1 : (t : ℚ) → (t ℚ.< 1ℚ) → convex-comb t ℚ.< d
   convex-comb-mono-1 t t<1 =
     begin-strict
-    convex-comb t   <⟨ {!convex-comb-mono 0ℚ t t<1!}  ⟩
+    convex-comb t   <⟨ convex-comb-mono t 1ℚ t<1  ⟩
     convex-comb 1ℚ  ≡⟨ convex-comb-1 ⟩
     d
     ∎
+
+  convex-comb-diff :
+    (t t' : ℚ) →
+    convex-comb t' ℚ.- convex-comb t ≡ (t' - t) ℚ.* (d - c)
+  convex-comb-diff = {!!}
+
+  convex-comb-diff-0 :
+    (t : ℚ) →
+    convex-comb t ℚ.- c ≡ t ℚ.* (d - c)
+  convex-comb-diff-0 t =
+    begin-equality
+    (c + t * (d - c) - c)    ≡⟨ cong (_- c) (ℚ.+-comm c (t * (d - c))) ⟩
+    (t * (d - c) + c - c)    ≡⟨ ℚ.+-assoc (t * (d - c)) c (- c) ⟩
+    (t * (d - c) + (c - c))  ≡⟨ cong (t * (d - c) +_) (ℚ.+-inverseʳ c) ⟩
+    (t * (d - c) + 0ℚ)       ≡⟨ ℚ.+-identityʳ (t * (d - c)) ⟩
+    (t * (d - c))            ∎
+
+  convex-comb-diff-1 :
+    (t : ℚ) →
+    d ℚ.- convex-comb t ≡ (1ℚ ℚ.- t) ℚ.* (d - c)
+  convex-comb-diff-1 = {!!}
 
 module IVT
   (f : cont)
@@ -209,7 +230,6 @@ module IVT
                   (capp f (fromℚ d₀))
                   0ℝ
                   (f-inc (fromℚ c₀) (fromℚ d₀) (fromℚ-preserves-< c₀ d₀ c₀<d₀))
-        open ℚ.≤-Reasoning
         c<d₀ : c ℚ.< d₀
         c<d₀ = convex-comb-mono-0 2/3 (from-yes (0ℚ ℚ.<? 2/3))
         c₀<d : c₀ ℚ.< d
@@ -219,7 +239,7 @@ module IVT
         correct-left : 0ℝ ℝ.≤ capp f (fromℚ d₀) → correct c d₀
         correct-left 0≤fd₀ = mkCorrect c<d₀ fc≤0 0≤fd₀
         compatible-left : 0ℝ ℝ.≤ capp f (fromℚ d₀) → compatible c d c d₀
-        compatible-left 0≤df₀ = mkCompat ℚ.≤-refl (ℚ.<⇒≤ d₀<d) {!!}
+        compatible-left 0≤df₀ = mkCompat ℚ.≤-refl (ℚ.<⇒≤ d₀<d) (convex-comb-diff-0 2/3)
 
 {-
   module Iteration

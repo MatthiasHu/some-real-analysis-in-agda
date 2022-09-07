@@ -15,7 +15,9 @@ What might prevent hanging?
 - compatibility as funciton  -- no
 - compatible and correct as functions  -- no
 - both functions defined by a hole  -- no!
-- filled in compatible
+- filled in compatible  -- no
 - no unsolved metas in import  -- no
 - unspecified result type  -- no
-- no use of from-yes
+- no use of from-yes  -- no
+- flat corr-comp record
+- first construction then properties
