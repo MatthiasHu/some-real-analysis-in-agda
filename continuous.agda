@@ -1,4 +1,3 @@
-
 module continuous where
 
 open import Data.Nat as ℕ using (ℕ; suc; zero)
@@ -150,6 +149,13 @@ module ConvexCombination
     convex-comb 0ℚ  <⟨ convex-comb-mono 0ℚ t 0<t  ⟩
     convex-comb t   ∎
 
+  convex-comb-mono-1 : (t : ℚ) → (t ℚ.< 1ℚ) → convex-comb t ℚ.< d
+  convex-comb-mono-1 t t<1 =
+    begin-strict
+    convex-comb t   <⟨ {!convex-comb-mono 0ℚ t t<1!}  ⟩
+    convex-comb 1ℚ  ≡⟨ convex-comb-1 ⟩
+    d
+    ∎
 
 module IVT
   (f : cont)
@@ -173,22 +179,18 @@ module IVT
   IVTAux :
     (c d : ℚ) →
     (correct c d) →
-    Σ (ℚ × ℚ) (λ (c' , d') → correct c' d' × c ℚ.≤ c' × d' ℚ.≤ d × (d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)))
+    Σ (ℚ × ℚ) (λ (c' , d') → correct c' d' × compatible c d c' d')
   IVTAux c d  (mkCorrect c<d fc≤0 0≤fd) =
     case split of λ
     { (inj₁ 0≤fd₀) →
           (c , d₀)
-        , ( record
-            { c<d = {! c<d₀ !}
-            ; fc≤0 = fc≤0
-            ; 0≤fd = 0≤fd₀
-            }
-          , {!!}
+        , ( correct-left 0≤fd₀
+          , {!compatible-left 0≤fd₀!}
           )
     ; (inj₂ fc₀≤0) →
           (c₀ , d)
         , ( record
-            { c<d = {! c₀<d !}
+            { c<d = {!c₀<d!}
             ; fc≤0 = fc₀≤0
             ; 0≤fd = 0≤fd
             }
@@ -211,11 +213,15 @@ module IVT
         c<d₀ : c ℚ.< d₀
         c<d₀ = convex-comb-mono-0 2/3 (from-yes (0ℚ ℚ.<? 2/3))
         c₀<d : c₀ ℚ.< d
-        c₀<d = begin-strict
-                 c₀              <⟨ convex-comb-mono 1/3 1ℚ ((from-yes (1/3 ℚ.<? 1ℚ))) ⟩
-                 convex-comb 1ℚ  ≡⟨ convex-comb-1 ⟩
-                 d               ∎
+        c₀<d = convex-comb-mono-1 1/3 (from-yes (1/3 ℚ.<? 1ℚ))
+        d₀<d : d₀ ℚ.< d
+        d₀<d = convex-comb-mono-1 2/3 (from-yes (2/3 ℚ.<? 1ℚ))
+        correct-left : 0ℝ ℝ.≤ capp f (fromℚ d₀) → correct c d₀
+        correct-left 0≤fd₀ = mkCorrect c<d₀ fc≤0 0≤fd₀
+        compatible-left : 0ℝ ℝ.≤ capp f (fromℚ d₀) → compatible c d c d₀
+        compatible-left 0≤df₀ = mkCompat ℚ.≤-refl (ℚ.<⇒≤ d₀<d) {!!}
 
+{-
   module Iteration
     (a b : ℚ)
     (ab-correct : correct a b)
@@ -311,3 +317,4 @@ module IVT
     IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
     IVT = {!!}
 
+-}

@@ -12,3 +12,10 @@ What might prevent hanging?
 - unfolded compatible  -- no
 - recursion operator  -- no
 - type signature for split  -- no
+- compatibility as funciton  -- no
+- compatible and correct as functions  -- no
+- both functions defined by a hole  -- no!
+- filled in compatible
+- no unsolved metas in import
+- unspecified result type
+- no use of from-yes
