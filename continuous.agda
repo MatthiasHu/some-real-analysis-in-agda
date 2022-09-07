@@ -176,25 +176,25 @@ module IVT
     Σ (ℚ × ℚ) (λ (c' , d') → correct c' d' × c ℚ.≤ c' × d' ℚ.≤ d × (d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)))
   IVTAux c d  (mkCorrect c<d fc≤0 0≤fd) =
     case split of λ
-      { (inj₁ 0≤fd₀) →
+    { (inj₁ 0≤fd₀) →
           (c , d₀)
         , ( record
             { c<d = {! c<d₀ !}
-            ; fc≤0 =  fc≤0 
+            ; fc≤0 = fc≤0
             ; 0≤fd = 0≤fd₀
             }
           , {!!}
           )
     ; (inj₂ fc₀≤0) →
-        (c₀ , d)
-      , ( record
-          { c<d = {! c₀<d !}
-          ; fc≤0 = fc₀≤0
-          ; 0≤fd = 0≤fd
-          }
-        , {!!}
-        )
-      }
+          (c₀ , d)
+        , ( record
+            { c<d = {! c₀<d !}
+            ; fc≤0 = fc₀≤0
+            ; 0≤fd = 0≤fd
+            }
+          , {!!}
+          )
+    }
     where
         open ConvexCombination c d c<d
         c₀ = convex-comb 1/3
