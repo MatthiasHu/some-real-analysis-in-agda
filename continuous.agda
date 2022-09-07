@@ -215,7 +215,7 @@ module IVT
                  convex-comb 1ℚ  ≡⟨ convex-comb-1 ⟩
                  d               ∎
 
-  module _
+  module Iteration
     (a b : ℚ)
     (ab-correct : correct a b)
     (b-a≤1 : b ℚ.- a ℚ.≤ 1ℚ)
