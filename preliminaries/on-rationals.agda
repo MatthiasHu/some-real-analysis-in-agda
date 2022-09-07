@@ -10,6 +10,8 @@ open import Data.Rational.Properties
 open import Data.Product
 open import Data.Sum
 
+open import Function.Base using (case_of_)
+
 open import Relation.Binary.PropositionalEquality
 
 open import Algebra.Bundles using (module Ring)
@@ -89,3 +91,36 @@ triangle-inequality a b c =
   ∣ a - c ∣               ≡⟨ cong ∣_∣ (insert-lemma a b c) ⟩
   ∣ (a - b) + (b - c) ∣   ≤⟨ ∣p+q∣≤∣p∣+∣q∣ (a - b) (b - c) ⟩
   ∣ a - b ∣ + ∣ b - c ∣   ∎
+
+
+--- on intervals ---
+
+_∈[_,_] : ℚ → ℚ → ℚ → Set
+b ∈[ a , c ] = a ≤ b × b ≤ c
+
+dist-interval :
+  (a c b b' : ℚ) →
+  (b ∈[ a , c ]) → (b' ∈[ a , c ]) →
+  ∣ b - b' ∣ ≤ c - a
+dist-interval a c b b' (a≤b , b≤c) (a≤b' , b'≤c) =
+  case ∣p∣≡p∨∣p∣≡-p (b - b') of λ
+    { (inj₁ ∣∣≡) →
+        begin
+        ∣ b - b' ∣  ≡⟨ ∣∣≡ ⟩
+        b - b'      ≤⟨ +-mono-≤ b≤c (neg-antimono-≤ a≤b') ⟩
+        c - a       ∎
+    ; (inj₂ ∣∣≡-) →
+        begin
+        ∣ b - b' ∣          ≡⟨ ∣∣≡- ⟩
+        - (b - b')          ≡⟨ neg-distrib-+ b (- b') ⟩
+        (- b) + (- (- b'))  ≡⟨ cong ((- b) +_) (negnegb'≡b' b') ⟩
+        (- b) + b'          ≡⟨ +-comm (- b) b' ⟩
+        b' - b              ≤⟨ +-mono-≤ b'≤c (neg-antimono-≤ a≤b) ⟩
+        c - a               ∎
+    }
+    where
+    -- I can't find this in the stdlib.
+    negnegb'≡b' : (b' : ℚ) → - (- b') ≡ b'
+    negnegb'≡b' (mkℚ (ℤ.+_ zero) denominator-1 isCoprime) = refl
+    negnegb'≡b' (mkℚ +[1+ n ] denominator-1 isCoprime) = refl
+    negnegb'≡b' (mkℚ (ℤ.-[1+_] n) denominator-1 isCoprime) = refl

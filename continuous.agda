@@ -241,21 +241,36 @@ module IVT
       ds n⊔m  ≤⟨ ds-mono m n⊔m (ℕ.m≤n⊔m n m) ⟩
       ds m    ∎
 
+    cs∈[cs,ds] : {k n : ℕ} → (k ℕ.≤ n) → cs n ∈[ cs k , ds k ]
+    cs∈[cs,ds] {k} {n} k≤n =
+        cs-mono k n k≤n
+      , ℚ.<⇒≤ (cs<ds n k)
+
+    ds∈[cs,ds] : {k n : ℕ} → (k ℕ.≤ n) → ds n ∈[ cs k , ds k ]
+    ds∈[cs,ds] {k} {n} k≤n =
+        ℚ.<⇒≤ (cs<ds k n)
+      , ds-mono k n k≤n
+
     cauchy-helper :
       (k : ℕ) →
       (n m : ℕ) →
       (n ℕ.≥ k) → (m ℕ.≥ k) →
-      ℚ.∣ cs m ℚ.- cs n ∣ ℚ.≤ (2/3 ^ k) ℚ.* (b ℚ.- a)
+      ℚ.∣ cs n ℚ.- cs m ∣ ℚ.≤ (2/3 ^ k) ℚ.* (b ℚ.- a)
     cauchy-helper k n m n≥k m≥k =
       begin
-      ℚ.∣ cs m ℚ.- cs n ∣                           ≡⟨ {!!} ⟩
-      ℚ.∣ cs m ℚ.- cs k ∣ ℚ.+ ℚ.∣ cs k ℚ.- cs n ∣   ≡⟨ {!!} ⟩
-      2/3 ^ k ℚ.* (b ℚ.- a)                         ∎
+      ℚ.∣ cs n ℚ.- cs m ∣     ≤⟨ dist-interval (cs k) (ds k) (cs n) (cs m)
+                                               (cs∈[cs,ds] n≥k) (cs∈[cs,ds] m≥k) ⟩
+      ds k ℚ.- cs k           ≡⟨ cds-dist k ⟩
+      2/3 ^ k ℚ.* (b ℚ.- a)   ∎
 
     x : ℝ
     ℝ.as x = cs
-    ℝ.M x p0 = 2 ℕ.* p0
-    ℝ.cauchy x = {!!}
+    ℝ.M x p = 2 ℕ.* p
+    ℝ.cauchy x p n m n≥ m≥ =
+      begin
+      ℚ.∣ cs n ℚ.- cs m ∣            ≤⟨ cauchy-helper (2 ℕ.* p) n m n≥ m≥ ⟩
+      2/3 ^ (2 ℕ.* p) ℚ.* (b ℚ.- a)  ≤⟨ {!!} ⟩
+      ½ ^ p                          ∎
 
     IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
     IVT = x , {!!}
