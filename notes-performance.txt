@@ -1,3 +1,5 @@
+Type checking hangs when the field c<d is filled and the compatibility
+goal is split.
 What might prevent hanging?
 
 - mkCorrect  -- no
@@ -9,4 +11,4 @@ What might prevent hanging?
 - mkCorrect and mkCompat  -- no
 - unfolded compatible  -- no
 - recursion operator  -- no
-- type signature for split
+- type signature for split  -- no
