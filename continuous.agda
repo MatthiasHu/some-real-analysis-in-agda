@@ -213,7 +213,7 @@ module IVT
         corr : correct c' d'
         c-mono : c ℚ.≤ c'
         d-mono : d' ℚ.≤ d
-        d-c : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
+        cd-dist : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
 
     open correct cd-correct
     open ConvexCombination c d c<d
@@ -252,7 +252,7 @@ module IVT
             }
           ; c-mono = ℚ.≤-refl
           ; d-mono = ℚ.<⇒≤ d₀<d
-          ; d-c = convex-comb-diff-0 2/3
+          ; cd-dist = convex-comb-diff-0 2/3
           }
       ; (inj₂ fc₀≤0) → record
           { c' = c₀
@@ -264,7 +264,7 @@ module IVT
             }
           ; c-mono = ℚ.<⇒≤ c<c₀
           ; d-mono = ℚ.≤-refl
-          ; d-c = convex-comb-diff-1 1/3
+          ; cd-dist = convex-comb-diff-1 1/3
           }
       }
 
@@ -273,29 +273,39 @@ module IVT
     (ab-correct : correct a b)
     (b-a≤1 : b ℚ.- a ℚ.≤ 1ℚ)
     where
-    
+
     open ℚ.≤-Reasoning
-        
-    cds : ℕ → ℚ × ℚ
-    cds zero = a , b
-    cds (suc n) = {!!}
 
     cs : ℕ → ℚ
-    cs n = proj₁ (cds n)
     ds : ℕ → ℚ
-    ds n = proj₂ (cds n)
-
     cds-correct : (n : ℕ) → correct (cs n) (ds n)
-    cds-correct = {!!}
+    step-conclusions : (n : ℕ) → Step.conclusion (cs n) (ds n) (cds-correct n)
 
-    cs-mono-suc : (n : ℕ) → cs n ℚ.≤ cs (suc n)
-    cs-mono-suc = {!!}
+    cs zero = a
+    cs (suc n) = Step.conclusion.c' (step-conclusions n)
 
-    ds-mono-suc : (n : ℕ) → ds (suc n) ℚ.≤ ds n
-    ds-mono-suc = {!!}
+    ds zero = b
+    ds (suc n) = Step.conclusion.d' (step-conclusions n)
 
-    cds-dist-suc : (n : ℕ) → (ds (suc n)) ℚ.- (cs (suc n)) ≡ 2/3 ℚ.* (ds n ℚ.- cs n)
-    cds-dist-suc = {!!}
+    cds-correct zero = ab-correct
+    cds-correct (suc n) = Step.conclusion.corr (step-conclusions n)
+
+    step-conclusions n = Step.IVTAux (cs n) (ds n) (cds-correct n)
+
+    module _
+      (n : ℕ)
+      where
+
+      open Step.conclusion (step-conclusions n)
+
+      cs-mono-suc : cs n ℚ.≤ cs (suc n)
+      cs-mono-suc = c-mono
+
+      ds-mono-suc : ds (suc n) ℚ.≤ ds n
+      ds-mono-suc = d-mono
+
+      cds-dist-suc : (ds (suc n)) ℚ.- (cs (suc n)) ≡ 2/3 ℚ.* (ds n ℚ.- cs n)
+      cds-dist-suc = cd-dist
 
     cds-dist : (k : ℕ) → ds k ℚ.- cs k ≡ (2/3 ^ k) ℚ.* (b ℚ.- a)
     cds-dist zero =
