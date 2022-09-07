@@ -289,7 +289,7 @@ module IVT
       begin-strict
       cs n    ≤⟨ cs-mono n n⊔m (ℕ.m≤m⊔n n m) ⟩
       cs n⊔m  <⟨ correct.c<d (cds-correct n⊔m) ⟩
-      ds n⊔m  ≤⟨ ds-mono m n⊔m (ℕ.n≤m⊔n n m) ⟩
+      ds n⊔m  ≤⟨ ds-mono m n⊔m (ℕ.m≤n⊔m n m) ⟩
       ds m    ∎
 
     cauchy-helper :
