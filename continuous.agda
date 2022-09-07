@@ -184,7 +184,6 @@ module IVT
   where
 
   record correct (c d : ℚ) : Set where
-    constructor mkCorrect
     field
       c<d : c ℚ.< d
       fc≤0 : capp f (fromℚ c) ℝ.≤ 0ℝ
@@ -192,7 +191,7 @@ module IVT
 
   module Step
     (c d : ℚ)
-    ((mkCorrect c<d fc≤0 0≤fd) : correct c d)
+    (cd-correct : correct c d)
     where
 
     record conclusion : Set where
@@ -204,6 +203,7 @@ module IVT
         d-mono : d' ℚ.≤ d
         d-c : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
 
+    open correct cd-correct
     open ConvexCombination c d c<d
 
     c₀ = convex-comb 1/3
@@ -211,6 +211,8 @@ module IVT
 
     c₀<d₀ : c₀ ℚ.< d₀
     c₀<d₀ = convex-comb-mono 1/3 2/3 (from-yes (1/3 ℚ.<? 2/3))
+    c<c₀ : c ℚ.< c₀
+    c<c₀ = convex-comb-mono-0 1/3 (from-yes (0ℚ ℚ.<? 1/3))
     c<d₀ : c ℚ.< d₀
     c<d₀ = convex-comb-mono-0 2/3 (from-yes (0ℚ ℚ.<? 2/3))
     c₀<d : c₀ ℚ.< d
@@ -228,8 +230,7 @@ module IVT
     IVTAux : conclusion
     IVTAux =
       case split of λ
-      { (inj₁ 0≤fd₀) →
-          record
+      { (inj₁ 0≤fd₀) → record
           { c' = c
           ; d' = d₀
           ; corr = record
@@ -241,7 +242,18 @@ module IVT
           ; d-mono = ℚ.<⇒≤ d₀<d
           ; d-c = convex-comb-diff-0 2/3
           }
-      ; (inj₂ fc₀≤0) → {!!}
+      ; (inj₂ fc₀≤0) → record
+          { c' = c₀
+          ; d' = d
+          ; corr = record
+            { c<d = c₀<d
+            ; fc≤0 = fc₀≤0
+            ; 0≤fd = 0≤fd
+            }
+          ; c-mono = ℚ.<⇒≤ c<c₀
+          ; d-mono = ℚ.≤-refl
+          ; d-c = convex-comb-diff-1 1/3
+          }
       }
 
   module Iteration
