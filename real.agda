@@ -49,6 +49,30 @@ _≃_ : ℝ → ℝ → Set
 (realConstr as M _) ≃ (realConstr bs N _) =
   (p : ℕ) → ℚ.∣ as (M (suc p)) ℚ.- bs (N (suc p)) ∣ ℚ.≤ ½ ^ p
 
+module ≃-Characterization
+  (x@(realConstr as M cauchy-as) : ℝ)
+  (y@(realConstr bs N cauchy-bs) : ℝ)
+  where
+
+  Characterization : Set
+  Characterization =
+    (p : ℕ) →
+    Σ ℕ (λ k →
+      (n m : ℕ) →
+      n ℕ.≥ k →
+      m ℕ.≥ k →
+      ℚ.∣ as n ℚ.- as m ∣ ℚ.≤ ½ ^ p)
+
+  to-characterization : x ≃ y → Characterization
+  to-characterization x≃y p =
+      p'
+    , λ n m n≥p' m≥p' → {!!}
+    where
+    p' = {!!}
+
+  from-characterization : Characterization → x ≃ y
+  from-characterization char p = {!!}
+
 ≃-refl : (x : ℝ) → x ≃ x
 ≃-refl (realConstr as M _) p = begin
   ℚ.∣ as (M (suc p)) ℚ.- as (M (suc p)) ∣  ≡⟨ cong ℚ.∣_∣ (ℚ.+-inverseʳ (as (M (suc p)))) ⟩
