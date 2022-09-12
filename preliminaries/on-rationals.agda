@@ -30,6 +30,22 @@ open ≤-Reasoning
 2/3 = ℤ.+ 2 / 3
 
 
+--- on negation
+
+neg-neg : (a : ℚ) → - (- a) ≡ a
+neg-neg (mkℚ (ℤ.+_ zero) denominator-1 isCoprime) = refl
+neg-neg (mkℚ +[1+ n ] denominator-1 isCoprime) = refl
+neg-neg (mkℚ (ℤ.-[1+_] n) denominator-1 isCoprime) = refl
+
+neg-diff : (a b : ℚ) → - (a - b) ≡ b - a
+neg-diff a b =
+  begin-equality
+        - (a - b)          ≡⟨ neg-distrib-+ a (- b) ⟩
+        (- a) + (- (- b))  ≡⟨ cong ((- a) +_) (neg-neg b) ⟩
+        (- a) + b          ≡⟨ +-comm (- a) b ⟩
+        b - a              ∎
+
+
 --- on small rational numbers ---
 
 Positive-½ : Positive ½
@@ -76,6 +92,13 @@ archimedian-ε = {!!}
 
 
 --- in relation to triangle inequality ---
+
+∣a-b∣≡∣b-a∣ : (a b : ℚ) → ∣ a - b ∣ ≡ ∣ b - a ∣
+∣a-b∣≡∣b-a∣ a b =
+  begin-equality
+  ∣ a - b ∣          ≡⟨ sym (∣-p∣≡∣p∣ (a - b)) ⟩
+  ∣ - (a - b) ∣      ≡⟨ cong ∣_∣ (neg-diff a b) ⟩
+  ∣ b - a ∣          ∎
 
 difference-of-sums :
   (a b a' b' : ℚ) →
@@ -137,15 +160,7 @@ dist-interval a c b b' (a≤b , b≤c) (a≤b' , b'≤c) =
     ; (inj₂ ∣∣≡-) →
         begin
         ∣ b - b' ∣          ≡⟨ ∣∣≡- ⟩
-        - (b - b')          ≡⟨ neg-distrib-+ b (- b') ⟩
-        (- b) + (- (- b'))  ≡⟨ cong ((- b) +_) (negnegb'≡b' b') ⟩
-        (- b) + b'          ≡⟨ +-comm (- b) b' ⟩
+        - (b - b')          ≡⟨ neg-diff b b' ⟩
         b' - b              ≤⟨ +-mono-≤ b'≤c (neg-antimono-≤ a≤b) ⟩
         c - a               ∎
     }
-    where
-    -- I can't find this in the stdlib.
-    negnegb'≡b' : (b' : ℚ) → - (- b') ≡ b'
-    negnegb'≡b' (mkℚ (ℤ.+_ zero) denominator-1 isCoprime) = refl
-    negnegb'≡b' (mkℚ +[1+ n ] denominator-1 isCoprime) = refl
-    negnegb'≡b' (mkℚ (ℤ.-[1+_] n) denominator-1 isCoprime) = refl
