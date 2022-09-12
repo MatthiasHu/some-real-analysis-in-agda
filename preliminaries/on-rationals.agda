@@ -59,13 +59,11 @@ Positive-½ = tt
 0ℚ<½^p p = 0ℚ<a^p ½ (from-yes (0ℚ <? ½)) p
 
 ½^sucp+½^sucp≡½^p : (p : ℕ) → ½ ^ (suc p) + ½ ^ (suc p) ≡ ½ ^ p
-½^sucp+½^sucp≡½^p zero = refl
-½^sucp+½^sucp≡½^p (suc p) =
+½^sucp+½^sucp≡½^p p =
   begin-equality
-  ½ ^ suc (suc p) + ½ ^ suc (suc p)  ≡⟨⟩
-  ½ * ½ ^ suc p + ½ * ½ ^ suc p  ≡˘⟨ *-distribˡ-+ ½ (½ ^ suc p) (½ ^ suc p) ⟩
-  ½ * (½ ^ suc p + ½ ^ suc p)      ≡⟨ cong (½ *_) (½^sucp+½^sucp≡½^p p) ⟩
-  ½ ^ suc p                            ∎
+  ½ * ½ ^ p + ½ * ½ ^ p  ≡˘⟨ *-distribʳ-+ (½ ^ p) ½ ½  ⟩
+  1ℚ * ½ ^ p             ≡⟨ *-identityˡ (½ ^ p) ⟩
+  ½ ^ p                  ∎
 
 
 --- archimedian properties ---
