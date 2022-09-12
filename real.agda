@@ -58,7 +58,15 @@ _≃_ : ℝ → ℝ → Set
   where
   open ℚ.≤-Reasoning
 
--- TODO: ≃-symm
+≃-symm : (x y : ℝ) → x ≃ y → y ≃ x
+≃-symm (realConstr as M cauchy-as) (realConstr bs N cauchy-bs) x≃y p =
+  begin
+  ℚ.∣ bs (N (suc p)) ℚ.- as (M (suc p)) ∣  ≡⟨ ∣a-b∣≡∣b-a∣ (bs (N (suc p))) (as (M (suc p))) ⟩
+  ℚ.∣ as (M (suc p)) ℚ.- bs (N (suc p)) ∣  ≤⟨ x≃y p ⟩
+  ½ ^ p  ∎
+  where
+  open ℚ.≤-Reasoning
+
 -- TODO: ≃-trans
 
 
