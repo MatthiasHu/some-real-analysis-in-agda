@@ -59,7 +59,8 @@ capp : cont → ℝ → ℝ
                      (ucont (as n) (as m) (suc p) m m≥α (cauchy-as (ω (suc p)) n m n≥M m≥M)) ⟩
   (½ ^ (suc p)) ℚ.+ (½ ^ (suc p))
        ≡⟨ ½^sucp+½^sucp≡½^p p ⟩
-  ½ ^ p    ∎
+  ½ ^ p
+       ∎
   where
   open ℚ.≤-Reasoning
   n≥α : n ℕ.≥ α (suc p)
@@ -73,22 +74,22 @@ capp : cont → ℝ → ℝ
 
 capp-preserves-≃ : (f : cont) → (x x' : ℝ) → x ≃ x' → capp f x ≃ capp f x'
 capp-preserves-≃
-  (contConstr h α ω h-cauchy ucont)
-  (ℝ.realConstr as M as-cauchy)
-  (ℝ.realConstr bs N bs-cauchy)
+  (contConstr h α ω cauchy-h ucont)
+  (ℝ.realConstr as M cauchy-as)
+  (ℝ.realConstr bs N cauchy-bs)
   x≃x'
   p
   =
   triangle-inequality-proof-scheme (h (as m) m) (h (as m) n) (h (bs n) n)
     (begin
-    ℚ.∣ h (as m) m ℚ.- h (as m) n ∣       ≤⟨ h-cauchy (as m) (suc (suc p)) m n (ℕ.m≤m⊔n _ _) (ℕ.m≤m⊔n _ _) ⟩
-    ½ ^ suc (suc p)                       ≤⟨ {!!} ⟩
-    ½ ^ suc p                             ∎)
+      ℚ.∣ h (as m) m ℚ.- h (as m) n ∣   ≤⟨ cauchy-h (as m) (suc (suc p)) m n (ℕ.m≤m⊔n _ _) (ℕ.m≤m⊔n _ _) ⟩
+      ½ ^ suc (suc p)                   ≤⟨ {!!} ⟩
+      ½ ^ suc p                         ∎)
     (begin
-    ℚ.∣ h (as m) n ℚ.- h (bs n) n ∣       ≤⟨ ucont (as m) (bs n) (suc (suc p)) n (ℕ.m≤m⊔n _ _)
-                                               {!x≃x' (suc p)!} ⟩
-    ½ ^ suc (suc p)                       ≤⟨ {!!} ⟩
-    ½ ^ suc p                             ∎)
+      ℚ.∣ h (as m) n ℚ.- h (bs n) n ∣   ≤⟨ ucont (as m) (bs n) (suc (suc p)) n (ℕ.m≤m⊔n _ _)
+                                            {!x≃x' (ω (suc p))!} ⟩
+      ½ ^ suc (suc p)                   ≤⟨ {!!} ⟩
+      ½ ^ suc p                         ∎)
     (ℚ.≤-reflexive (½^sucp+½^sucp≡½^p p))
   where
   open ℚ.≤-Reasoning
