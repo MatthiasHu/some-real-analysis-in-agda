@@ -10,6 +10,8 @@ open import Data.Rational.Properties
 open import Data.Product
 open import Data.Sum
 
+open import Relation.Nullary.Decidable
+
 open import Function.Base using (case_of_)
 
 open import Relation.Binary.PropositionalEquality
@@ -33,12 +35,28 @@ open ≤-Reasoning
 Positive-½ : Positive ½
 Positive-½ = tt
 
+0ℚ<a^p : (a : ℚ) → (0ℚ < a) → (p : ℕ) → 0ℚ < a ^ p
+0ℚ<a^p a 0<a zero = from-yes (0ℚ <? 1ℚ)
+0ℚ<a^p a 0<a (suc p) =
+  begin-strict
+  0ℚ         ≡⟨ sym (*-zeroʳ a) ⟩
+  a * 0ℚ     <⟨ *-monoʳ-<-pos a (positive 0<a)  0<a^p ⟩
+  a * a ^ p  ∎
+  where
+  0<a^p = 0ℚ<a^p a 0<a p
+
+0ℚ≤a^p : (a : ℚ) → (0ℚ ≤ a) → (p : ℕ) → 0ℚ ≤ a ^ p
+0ℚ≤a^p a 0≤a zero = from-yes (0ℚ ≤? 1ℚ)
+0ℚ≤a^p a 0≤a (suc p) =
+  begin
+  0ℚ         ≡⟨ sym (*-zeroʳ a) ⟩
+  a * 0ℚ     ≤⟨  *-monoˡ-≤-nonNeg a (nonNegative 0≤a) 0≤a^p ⟩
+  a * a ^ p  ∎
+  where
+  0≤a^p = 0ℚ≤a^p a 0≤a p
+
 0ℚ<½^p : (p : ℕ) → 0ℚ < ½ ^ p
-0ℚ<½^p ℕ.zero = positive⁻¹ tt
-0ℚ<½^p (suc p) = begin-strict
-  0ℚ             ≡⟨⟩
-  ½ * 0ℚ       <⟨ *-monoʳ-<-pos ½ Positive-½ (0ℚ<½^p p) ⟩
-  ½ * (½ ^ p)  ∎
+0ℚ<½^p p = 0ℚ<a^p ½ (from-yes (0ℚ <? ½)) p
 
 ½^sucp+½^sucp≡½^p : (p : ℕ) → ½ ^ (suc p) + ½ ^ (suc p) ≡ ½ ^ p
 ½^sucp+½^sucp≡½^p zero = refl

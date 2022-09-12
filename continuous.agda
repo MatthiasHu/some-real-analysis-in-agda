@@ -269,8 +269,18 @@ module IVT
     ℝ.cauchy x p n m n≥ m≥ =
       begin
       ℚ.∣ cs n ℚ.- cs m ∣            ≤⟨ cauchy-helper (2 ℕ.* p) n m n≥ m≥ ⟩
-      2/3 ^ (2 ℕ.* p) ℚ.* (b ℚ.- a)  ≤⟨ {!!} ⟩
+      2/3 ^ (2 ℕ.* p) ℚ.* (b ℚ.- a)  ≡⟨ cong (λ c → c ℚ.* (b ℚ.- a)) (sym (^-assocʳ 2/3 2 p)) ⟩
+      (2/3 ^ 2)^ p ℚ.* (b ℚ.- a)     ≤⟨ ℚ.*-monoˡ-≤-pos ((2/3 ^ 2)^ p)
+                                                        (ℚ.positive (0ℚ<a^p (2/3 ^ 2) 0<4/9 p))
+                                                        b-a≤1 ⟩
+      (2/3 ^ 2)^ p ℚ.* 1ℚ            ≡⟨ ℚ.*-identityʳ ((2/3 ^ 2)^ p) ⟩
+      (2/3 ^ 2)^ p                   ≤⟨ {!!} ⟩
       ½ ^ p                          ∎
+      where
+      0<4/9 : 0ℚ ℚ.< (2/3 ^ 2)
+      0<4/9 = from-yes (0ℚ ℚ.<? (2/3 ^ 2))
+      4/9≤½ : 2/3 ^ 2 ℚ.≤ ½
+      4/9≤½ = from-yes (2/3 ^ 2 ℚ.≤? ½)
 
     IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
     IVT = x , {!!}
