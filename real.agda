@@ -76,6 +76,7 @@ fromℚ : ℚ → ℝ
 
 0ℝ = fromℚ 0ℚ
 
+
 --- basic predicates of real numbers ---
 
 nneg : ℝ → Set

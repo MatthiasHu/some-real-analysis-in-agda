@@ -32,11 +32,16 @@ record cont : Set where
     h : ℚ → ℕ → ℚ
     α : ℕ → ℕ
     ω : ℕ → ℕ
-    μ : ℚ
-    ν : ℚ
+    -- μ : ℚ
+    -- ν : ℚ
 
     cauchy : (a : ℚ) → Cauchy (h a) α
-    ucont : (a b : ℚ) → (p n : ℕ) → α p ℕ.≤ n → ℚ.∣ a ℚ.- b ∣ ℚ.≤ ½ ^ (ω p) → ℚ.∣ h a n ℚ.- h b n ∣ ℚ.≤ ½ ^ p
+    ucont :
+      (a b : ℚ) →
+      (p n : ℕ) →
+      α p ℕ.≤ n →
+      ℚ.∣ a ℚ.- b ∣ ℚ.≤ ½ ^ (ω p) →
+      ℚ.∣ h a n ℚ.- h b n ∣ ℚ.≤ ½ ^ p
     -- Do we need more?
 
 
@@ -45,7 +50,7 @@ record cont : Set where
 capp : cont → ℝ → ℝ
 ℝ.as (capp f (ℝ.realConstr as M cauchy-as)) n = cont.h f (as n) n 
 ℝ.M (capp f (ℝ.realConstr as M cauchy-as)) p = cont.α f (suc p) ℕ.⊔ M (cont.ω f (suc p))
-ℝ.cauchy (capp (contConstr h α ω μ ν cauchy-h ucont) (ℝ.realConstr as M cauchy-as)) p n m n≥ m≥ =
+ℝ.cauchy (capp (contConstr h α ω cauchy-h ucont) (ℝ.realConstr as M cauchy-as)) p n m n≥ m≥ =
   begin
   ℚ.∣ h (as n) n ℚ.- h (as m) m ∣
        ≤⟨ triangle-inequality (h (as n) n) (h (as n) m) (h (as m) m) ⟩
@@ -66,9 +71,32 @@ capp : cont → ℝ → ℝ
   m≥M : m ℕ.≥ M (ω (suc p))
   m≥M = (ℕ.m⊔n≤o⇒n≤o (α (suc p)) (M (ω (suc p))) m≥)
 
--- TODO: capp-preserves-≃
+capp-preserves-≃ : (f : cont) → (x x' : ℝ) → x ≃ x' → capp f x ≃ capp f x'
+capp-preserves-≃
+  (contConstr h α ω h-cauchy ucont)
+  (ℝ.realConstr as M as-cauchy)
+  (ℝ.realConstr bs N bs-cauchy)
+  x≃x'
+  p
+  =
+  triangle-inequality-proof-scheme (h (as m) m) (h (as m) n) (h (bs n) n)
+    (begin
+    ℚ.∣ h (as m) m ℚ.- h (as m) n ∣       ≤⟨ h-cauchy (as m) (suc (suc p)) m n (ℕ.m≤m⊔n _ _) (ℕ.m≤m⊔n _ _) ⟩
+    ½ ^ suc (suc p)                       ≤⟨ {!!} ⟩
+    ½ ^ suc p                             ∎)
+    (begin
+    ℚ.∣ h (as m) n ℚ.- h (bs n) n ∣       ≤⟨ ucont (as m) (bs n) (suc (suc p)) n (ℕ.m≤m⊔n _ _)
+                                               {!x≃x' (suc p)!} ⟩
+    ½ ^ suc (suc p)                       ≤⟨ {!!} ⟩
+    ½ ^ suc p                             ∎)
+    (ℚ.≤-reflexive (½^sucp+½^sucp≡½^p p))
+  where
+  open ℚ.≤-Reasoning
+  m = α (suc (suc p)) ℕ.⊔ M (ω (suc (suc p)))
+  n = α (suc (suc p)) ℕ.⊔ N (ω (suc (suc p)))
 
 
+{-
 --- increasing functions ---
 
 strictly-increasing : cont → Set
@@ -284,3 +312,5 @@ module IVT
 
     IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
     IVT = x , {!!}
+
+-}

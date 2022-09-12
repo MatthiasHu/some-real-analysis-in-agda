@@ -108,6 +108,15 @@ triangle-inequality a b c =
   ∣ (a - b) + (b - c) ∣   ≤⟨ ∣p+q∣≤∣p∣+∣q∣ (a - b) (b - c) ⟩
   ∣ a - b ∣ + ∣ b - c ∣   ∎
 
+triangle-inequality-proof-scheme :
+  (a b c : ℚ) →
+  {ab bc ac : ℚ} →
+  ∣ a - b ∣ ≤ ab →
+  ∣ b - c ∣ ≤ bc →
+  ab + bc ≤ ac →
+  ∣ a - c ∣ ≤ ac
+triangle-inequality-proof-scheme = {!!}
+
 
 --- on intervals ---
 
