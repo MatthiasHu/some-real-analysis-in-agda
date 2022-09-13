@@ -29,7 +29,8 @@ open ≤-Reasoning
 1/3 = ℤ.+ 1 / 3
 2/3 = ℤ.+ 2 / 3
 2ℚ = ℤ.+ 2 / 1
- 
+
+
 --- on negation
 
 neg-neg : (a : ℚ) → - (- a) ≡ a
