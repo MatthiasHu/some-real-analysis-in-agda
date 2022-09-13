@@ -132,9 +132,16 @@ module IVT
 
     record conclusion : Set where
       field
-        c' : ℚ
-        d' : ℚ
-        c'd'-correct : correct c' d'
+        correct-c'd' : correct-pair
+
+      open correct-pair correct-c'd' public
+        renaming
+          ( c to c'
+          ; d to d'
+          ; cd-correct to c'd'-correct
+          )
+
+      field
         c-mono : c ℚ.≤ c'
         d-mono : d' ℚ.≤ d
         cd-dist : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
@@ -167,24 +174,28 @@ module IVT
     IVTAux =
       case split of λ
       { (inj₁ 0≤fd₀) → record
-          { c' = c
-          ; d' = d₀
-          ; c'd'-correct = record
-            { c<d = c<d₀
-            ; fc≤0 = fc≤0
-            ; 0≤fd = 0≤fd₀
+          { correct-c'd' = record
+            { c = c
+            ; d = d₀
+            ; cd-correct = record
+              { c<d = c<d₀
+              ; fc≤0 = fc≤0
+              ; 0≤fd = 0≤fd₀
+              }
             }
           ; c-mono = ℚ.≤-refl
           ; d-mono = ℚ.<⇒≤ d₀<d
           ; cd-dist = convex-comb-diff-0 2/3
           }
       ; (inj₂ fc₀≤0) → record
-          { c' = c₀
-          ; d' = d
-          ; c'd'-correct = record
-            { c<d = c₀<d
-            ; fc≤0 = fc₀≤0
-            ; 0≤fd = 0≤fd
+          { correct-c'd' = record
+            { c = c₀
+            ; d = d
+            ; cd-correct = record
+              { c<d = c₀<d
+              ; fc≤0 = fc₀≤0
+              ; 0≤fd = 0≤fd
+              }
             }
           ; c-mono = ℚ.<⇒≤ c<c₀
           ; d-mono = ℚ.≤-refl
@@ -202,6 +213,8 @@ module IVT
 
     -- We must be careful to avoid any branching in the mutually recursive definition.
     -- Otherwise we would get exponential running time.
+    -- It seems like we can not even decompose and put back together a record.
+    -- And there might be more things we are still doing wrong.
 
     correct-cds : ℕ → correct-pair
     step-conclusions : (n : ℕ) → Step.conclusion (correct-cds n)
@@ -213,14 +226,7 @@ module IVT
       ; cd-correct = ab-correct
       }
     correct-cds (suc n) =
-      record
-      { c = c'
-      ; d = d'
-      ; cd-correct = c'd'-correct
-      }
-      where
-      concl = step-conclusions n
-      open Step.conclusion concl
+      Step.conclusion.correct-c'd' (step-conclusions n)
 
     step-conclusions n = Step.IVTAux (correct-cds n)
 
