@@ -49,6 +49,7 @@ _≃_ : ℝ → ℝ → Set
 (realConstr as M _) ≃ (realConstr bs N _) =
   (p : ℕ) → ℚ.∣ as (M (suc p)) ℚ.- bs (N (suc p)) ∣ ℚ.≤ ½ ^ p
 
+-- Should we do the characterization for _≤_ instead of _≃_ ?
 module ≃-Characterization
   (x@(realConstr as M cauchy-as) : ℝ)
   (y@(realConstr bs N cauchy-bs) : ℝ)
