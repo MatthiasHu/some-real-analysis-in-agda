@@ -38,6 +38,6 @@ x^2-2-inc = {!!}
 as : ℕ → ℚ
 as = ℝ.as √2
 
--- as  5 computes to 108 / 81
+-- as  5 computes to 107 / 81
 -- as 10 computes to 27697 / 19683
 -- as 20 hangs

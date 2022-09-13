@@ -118,16 +118,23 @@ module IVT
       fc≤0 : capp f (fromℚ c) ℝ.≤ 0ℝ
       0≤fd : 0ℝ ℝ.≤ capp f (fromℚ d)
 
+  record correct-pair : Set where
+    field
+      c : ℚ
+      d : ℚ
+      cd-correct : correct c d
+
   module Step
-    (c d : ℚ)
-    (cd-correct : correct c d)
+    (correct-cd : correct-pair)
     where
+
+    open correct-pair correct-cd
 
     record conclusion : Set where
       field
         c' : ℚ
         d' : ℚ
-        corr : correct c' d'
+        c'd'-correct : correct c' d'
         c-mono : c ℚ.≤ c'
         d-mono : d' ℚ.≤ d
         cd-dist : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
@@ -162,7 +169,7 @@ module IVT
       { (inj₁ 0≤fd₀) → record
           { c' = c
           ; d' = d₀
-          ; corr = record
+          ; c'd'-correct = record
             { c<d = c<d₀
             ; fc≤0 = fc≤0
             ; 0≤fd = 0≤fd₀
@@ -174,7 +181,7 @@ module IVT
       ; (inj₂ fc₀≤0) → record
           { c' = c₀
           ; d' = d
-          ; corr = record
+          ; c'd'-correct = record
             { c<d = c₀<d
             ; fc≤0 = fc₀≤0
             ; 0≤fd = 0≤fd
@@ -193,30 +200,38 @@ module IVT
 
     open ℚ.≤-Reasoning
 
-    correct-cds : ℕ → Σ (ℚ × ℚ) (λ cd → correct (proj₁ cd) (proj₂ cd))
-    correct-cds zero = (a , b) , ab-correct
+    -- We must be careful to avoid any branching in the mutually recursive definition.
+    -- Otherwise we would get exponential running time.
+
+    correct-cds : ℕ → correct-pair
+    step-conclusions : (n : ℕ) → Step.conclusion (correct-cds n)
+
+    correct-cds zero =
+      record
+      { c = a
+      ; d = b
+      ; cd-correct = ab-correct
+      }
     correct-cds (suc n) =
-      (c' , d') , corr
+      record
+      { c = c'
+      ; d = d'
+      ; cd-correct = c'd'-correct
+      }
       where
-      correct-cd = correct-cds n
-      c = proj₁ (proj₁ correct-cd)
-      d = proj₂ (proj₁ correct-cd)
-      cd-correct = proj₂ correct-cd
-      concl = Step.IVTAux c d cd-correct
+      concl = step-conclusions n
       open Step.conclusion concl
 
+    step-conclusions n = Step.IVTAux (correct-cds n)
+
     cs : ℕ → ℚ
-    cs n = proj₁ (proj₁ (correct-cds n))
+    cs n = correct-pair.c (correct-cds n)
 
     ds : ℕ → ℚ
-    ds n = proj₂ (proj₁ (correct-cds n))
+    ds n = correct-pair.d (correct-cds n)
 
     cds-correct : (n : ℕ) → correct (cs n) (ds n)
-    cds-correct n = proj₂ (correct-cds n)
-
-{-
-    step-conclusions : (n : ℕ) → Step.conclusion (cs n) (ds n) (cds-correct n)
-    step-conclusions n = {! Step.IVTAux (cs n) (ds n) (cds-correct n) !}
+    cds-correct n = correct-pair.cd-correct (correct-cds n)
 
     module _
       (n : ℕ)
@@ -323,4 +338,3 @@ module IVT
 
     IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
     IVT = x , {!!}
--}
