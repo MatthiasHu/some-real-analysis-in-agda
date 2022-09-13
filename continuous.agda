@@ -193,21 +193,30 @@ module IVT
 
     open ℚ.≤-Reasoning
 
+    correct-cds : ℕ → Σ (ℚ × ℚ) (λ cd → correct (proj₁ cd) (proj₂ cd))
+    correct-cds zero = (a , b) , ab-correct
+    correct-cds (suc n) =
+      (c' , d') , corr
+      where
+      correct-cd = correct-cds n
+      c = proj₁ (proj₁ correct-cd)
+      d = proj₂ (proj₁ correct-cd)
+      cd-correct = proj₂ correct-cd
+      concl = Step.IVTAux c d cd-correct
+      open Step.conclusion concl
+
     cs : ℕ → ℚ
+    cs n = proj₁ (proj₁ (correct-cds n))
+
     ds : ℕ → ℚ
+    ds n = proj₂ (proj₁ (correct-cds n))
+
     cds-correct : (n : ℕ) → correct (cs n) (ds n)
+    cds-correct n = proj₂ (correct-cds n)
+
+{-
     step-conclusions : (n : ℕ) → Step.conclusion (cs n) (ds n) (cds-correct n)
-
-    cs zero = a
-    cs (suc n) = Step.conclusion.c' (step-conclusions n)
-
-    ds zero = b
-    ds (suc n) = Step.conclusion.d' (step-conclusions n)
-
-    cds-correct zero = ab-correct
-    cds-correct (suc n) = Step.conclusion.corr (step-conclusions n)
-
-    step-conclusions n = Step.IVTAux (cs n) (ds n) (cds-correct n)
+    step-conclusions n = {! Step.IVTAux (cs n) (ds n) (cds-correct n) !}
 
     module _
       (n : ℕ)
@@ -314,3 +323,4 @@ module IVT
 
     IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
     IVT = x , {!!}
+-}
