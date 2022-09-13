@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+
 module continuous where
 
 open import Data.Nat as ℕ using (ℕ; suc; zero)
@@ -97,7 +99,6 @@ capp-preserves-≃
   n = α (suc (suc p)) ℕ.⊔ N (ω (suc (suc p)))
 
 
-{-
 --- increasing functions ---
 
 strictly-increasing : cont → Set
@@ -313,5 +314,3 @@ module IVT
 
     IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
     IVT = x , {!!}
-
--}
