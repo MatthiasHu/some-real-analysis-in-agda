@@ -170,6 +170,11 @@ module IVT
               0ℝ
               (f-inc (fromℚ c₀) (fromℚ d₀) (fromℚ-preserves-< c₀ d₀ c₀<d₀))
 
+    -- It was important for execution performance to use the [_,_]′ operator
+    -- instead of a pattern lambda here.
+    -- Remember that both pattern lambdas and definitions in a parametrized
+    -- module are "lifted" to the global scope...
+
     IVTAux : conclusion
     IVTAux =
       [ (λ 0≤fd₀ → record
