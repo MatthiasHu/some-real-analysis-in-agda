@@ -9,7 +9,7 @@ import Data.Rational.Properties as ℚ
 open import Data.Product
 open import Data.Sum
 
-open import Relation.Binary.PropositionalEquality
+open import Relation.Binary.PropositionalEquality hiding ([_])
 open import Relation.Nullary.Decidable
 
 open import Function.Base using (case_of_)
@@ -172,8 +172,7 @@ module IVT
 
     IVTAux : conclusion
     IVTAux =
-      case split of λ
-      { (inj₁ 0≤fd₀) → record
+      [ (λ 0≤fd₀ → record
           { correct-c'd' = record
             { c = c
             ; d = d₀
@@ -187,7 +186,8 @@ module IVT
           ; d-mono = ℚ.<⇒≤ d₀<d
           ; cd-dist = convex-comb-diff-0 2/3
           }
-      ; (inj₂ fc₀≤0) → record
+        )
+      , (λ fc₀≤0 → record
           { correct-c'd' = record
             { c = c₀
             ; d = d
@@ -201,7 +201,9 @@ module IVT
           ; d-mono = ℚ.≤-refl
           ; cd-dist = convex-comb-diff-1 1/3
           }
-      }
+        )
+      ]′
+      split
 
   module Iteration
     (a b : ℚ)
@@ -281,7 +283,7 @@ module IVT
         cs (suc diff ℕ.+ k)  ∎
 
     ds-mono : (k n : ℕ) → (k ℕ.≤ n) → (ds n ℚ.≤ ds k)
-    ds-mono k n k≤n =  subst (λ n' → ds n' ℚ.≤ ds k) (ℕ.m∸n+n≡m k≤n) (helper (n ℕ.∸ k) ) 
+    ds-mono k n k≤n =  subst (λ n' → ds n' ℚ.≤ ds k) (ℕ.m∸n+n≡m k≤n) (helper (n ℕ.∸ k) )
       where
       helper : (diff : ℕ) → ds (diff ℕ.+ k) ℚ.≤ ds k
       helper zero = ℚ.≤-refl

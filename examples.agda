@@ -40,4 +40,5 @@ as = ℝ.as √2
 
 -- as  5 computes to 107 / 81
 -- as 10 computes to 27697 / 19683
--- as 20 would hang before optimization and takes around 20s now
+-- as 20 would hang before the first optimization and took around 20s after
+-- as 100 takes ca 1s now
