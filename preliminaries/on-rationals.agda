@@ -26,9 +26,13 @@ open ≤-Reasoning
 
 --- some more constants ---
 
+1/2 = ½
 1/3 = ℤ.+ 1 / 3
 2/3 = ℤ.+ 2 / 3
+1/4 = ℤ.+ 1 / 4
+3/4 = ℤ.+ 3 / 4
 2ℚ = ℤ.+ 2 / 1
+
 
 
 --- on negation

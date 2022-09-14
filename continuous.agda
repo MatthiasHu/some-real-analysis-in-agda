@@ -144,14 +144,18 @@ module IVT
       field
         c-mono : c ℚ.≤ c'
         d-mono : d' ℚ.≤ d
-        cd-dist : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
+        cd-dist : d' ℚ.- c' ≡ 1/2 ℚ.* (d ℚ.- c)
 
     open correct cd-correct
     open ConvexCombination c d c<d
 
-    c₀ = convex-comb 1/3
-    d₀ = convex-comb 2/3
+    b₀ = c
+    b₁ = convex-comb 1/4
+    b₂ = convex-comb 1/2
+    b₃ = convex-comb 3/4
+    b₄ = d
 
+{-
     c₀<d₀ : c₀ ℚ.< d₀
     c₀<d₀ = convex-comb-mono 1/3 2/3 (from-yes (1/3 ℚ.<? 2/3))
     c<c₀ : c ℚ.< c₀
@@ -162,45 +166,57 @@ module IVT
     c₀<d = convex-comb-mono-1 1/3 (from-yes (1/3 ℚ.<? 1ℚ))
     d₀<d : d₀ ℚ.< d
     d₀<d = convex-comb-mono-1 2/3 (from-yes (2/3 ℚ.<? 1ℚ))
+-}
 
-    split : 0ℝ ℝ.≤ capp f (fromℚ d₀) ⊎ capp f (fromℚ c₀) ℝ.≤ 0ℝ
-    split = approxSplit
-              (capp f (fromℚ c₀))
-              (capp f (fromℚ d₀))
-              0ℝ
-              (f-inc (fromℚ c₀) (fromℚ d₀) (fromℚ-preserves-< c₀ d₀ c₀<d₀))
+    split₁₂ : 0ℝ ℝ.≤ capp f (fromℚ b₂) ⊎ capp f (fromℚ b₁) ℝ.≤ 0ℝ
+    split₁₂ = approxSplit
+               (capp f (fromℚ b₁))
+               (capp f (fromℚ b₂))
+               0ℝ
+               (f-inc (fromℚ b₁) (fromℚ b₂) {!!})
+
+    split₂₃ : 0ℝ ℝ.≤ capp f (fromℚ b₃) ⊎ capp f (fromℚ b₂) ℝ.≤ 0ℝ
+    split₂₃ = approxSplit
+               (capp f (fromℚ b₂))
+               (capp f (fromℚ b₃))
+               0ℝ
+               (f-inc (fromℚ b₂) (fromℚ b₃) {!!})
 
     IVTAux : conclusion
     IVTAux =
-      case split of λ
-      { (inj₁ 0≤fd₀) → record
+      case split₁₂ of λ
+      { (inj₁ 0≤fb₂) → record
           { correct-c'd' = record
-            { c = c
-            ; d = d₀
-            ; cd-correct = record
-              { c<d = c<d₀
-              ; fc≤0 = fc≤0
-              ; 0≤fd = 0≤fd₀
-              }
+            { c = b₀
+            ; d = b₂
+            ; cd-correct = {!!}
             }
-          ; c-mono = ℚ.≤-refl
-          ; d-mono = ℚ.<⇒≤ d₀<d
-          ; cd-dist = convex-comb-diff-0 2/3
+          ; c-mono = {!!}
+          ; d-mono = {!!}
+          ; cd-dist = {!!}
           }
-      ; (inj₂ fc₀≤0) → record
+      ; (inj₂ fb₁≤0) → case split₂₃ of λ
+        { (inj₁ 0≤fb₃) → record
           { correct-c'd' = record
-            { c = c₀
-            ; d = d
-            ; cd-correct = record
-              { c<d = c₀<d
-              ; fc≤0 = fc₀≤0
-              ; 0≤fd = 0≤fd
-              }
+            { c = b₁
+            ; d = b₃
+            ; cd-correct = {!!}
             }
-          ; c-mono = ℚ.<⇒≤ c<c₀
-          ; d-mono = ℚ.≤-refl
-          ; cd-dist = convex-comb-diff-1 1/3
+          ; c-mono = {!!}
+          ; d-mono = {!!}
+          ; cd-dist = {!!}
           }
+        ; (inj₂ fb₂≤0) → record
+          { correct-c'd' = record
+            { c = b₂
+            ; d = b₄
+            ; cd-correct = {!!}
+            }
+          ; c-mono = {!!}
+          ; d-mono = {!!}
+          ; cd-dist = {!!}
+          }
+        }
       }
 
   module Iteration
@@ -243,6 +259,7 @@ module IVT
       (n : ℕ)
       where
 
+{-
       open Step.conclusion (step-conclusions n)
 
       cs-mono-suc : cs n ℚ.≤ cs (suc n)
@@ -251,7 +268,7 @@ module IVT
       ds-mono-suc : ds (suc n) ℚ.≤ ds n
       ds-mono-suc = d-mono
 
-      cds-dist-suc : (ds (suc n)) ℚ.- (cs (suc n)) ≡ 2/3 ℚ.* (ds n ℚ.- cs n)
+      cds-dist-suc : (ds (suc n)) ℚ.- (cs (suc n)) ≡ 1/2 ℚ.* (ds n ℚ.- cs n)
       cds-dist-suc = cd-dist
 
     cds-dist : (k : ℕ) → ds k ℚ.- cs k ≡ (2/3 ^ k) ℚ.* (b ℚ.- a)
@@ -322,11 +339,12 @@ module IVT
                                                (cs∈[cs,ds] n≥k) (cs∈[cs,ds] m≥k) ⟩
       ds k ℚ.- cs k           ≡⟨ cds-dist k ⟩
       2/3 ^ k ℚ.* (b ℚ.- a)   ∎
+-}
 
     x : ℝ
     ℝ.as x = cs
-    ℝ.M x p = 2 ℕ.* p
-    ℝ.cauchy x p n m n≥ m≥ =
+    ℝ.M x p = {! 2 ℕ.* p !}
+    ℝ.cauchy x p n m n≥ m≥ = {!
       begin
       ℚ.∣ cs n ℚ.- cs m ∣            ≤⟨ cauchy-helper (2 ℕ.* p) n m n≥ m≥ ⟩
       2/3 ^ (2 ℕ.* p) ℚ.* (b ℚ.- a)  ≡⟨ cong (λ c → c ℚ.* (b ℚ.- a)) (sym (^-assocʳ 2/3 2 p)) ⟩
@@ -341,6 +359,8 @@ module IVT
       0<4/9 = from-yes (0ℚ ℚ.<? (2/3 ^ 2))
       4/9≤½ : 2/3 ^ 2 ℚ.≤ ½
       4/9≤½ = from-yes (2/3 ^ 2 ℚ.≤? ½)
+      !}
 
     IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
     IVT = x , {!!}
+
