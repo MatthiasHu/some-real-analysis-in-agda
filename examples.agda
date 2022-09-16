@@ -42,3 +42,14 @@ as = ℝ.as √2
 -- as 10 computes to 27697 / 19683
 -- as 20 would hang before the first optimization and took around 20s after
 -- as 100 takes ca 1s now
+
+-- as 100 takes ca 1s
+-- as 200 takes ca 4s
+-- as 300 takes ca 8s
+-- as 400 takes ca 14s
+-- as 500 takes ca 22s
+-- as 600 takes ca 31s
+-- as 700 takes ca 42s
+-- as 800 takes ca 55s
+-- Looks quadratic.
+-- Which is the best we can expect!

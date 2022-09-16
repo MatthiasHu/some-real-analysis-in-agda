@@ -37,6 +37,12 @@ as (ℕ.suc n) =
   ; (yes p) → left
   }
 
+-- as 100 takes < 1s
+-- as 200 takes ca 1.5s
+-- as 400 takes ca 6s
+-- as 800 takes ca 21s
+-- Looks quadratic.
+
 
 bs : ℕ → ℚ
 bs ℕ.zero = 1ℚ
@@ -53,10 +59,8 @@ syntax co x (λ a → body) = let' a be x in' body
 cs : ℕ → ℕ
 cs ℕ.zero = 1
 cs (suc n) =
-  case cs n of (λ { ℕ.zero → 0 ; a → a ℕ.+ a })
+  case cs n of (λ a → a ℕ.+ a)  -- fast. (with NOINLINE case_of_)
 --  let' a be cs n in' (a ℕ.+ a)  -- fast.
 --  primForce (cs n) (λ a → a ℕ.+ a)  -- fast.
 --  a ℕ.+ a where a = cs n  -- slow.
---  case cs n of (λ a → a ℕ.+ a)  -- fast.
 --  let a = cs n in a ℕ.+ a   -- slow.
-
