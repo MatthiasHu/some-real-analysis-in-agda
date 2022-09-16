@@ -23,7 +23,7 @@ open import continuous
 
 
 x^2-2 : cont
-cont.h x^2-2 a p = a ℚ.- (1ℚ ℚ.+ 1/3)
+cont.h x^2-2 a p = a ^ 2 ℚ.- 2ℚ
 cont.α x^2-2 p = 0
 cont.ω x^2-2 = {!!}
 cont.cauchy x^2-2 = {!!}
