@@ -61,17 +61,17 @@ module ≃-Characterization
     Σ ℕ (λ k →
       (n m : ℕ) →
       n ℕ.≥ k →
-      m ℕ.≥ k →
-      ℚ.∣ as n ℚ.- bs m ∣ ℚ.≤ ½ ^ p)
+      ℚ.∣ as n ℚ.- bs n ∣ ℚ.≤ ½ ^ p)
 
   to-characterization : x ≃ y → Characterization
   to-characterization x≃y p =
       k
-    , λ n m n≥k m≥k →
+    , λ n n≥k → {!
         triangle-inequality-proof-scheme (as n) (as k1) (bs m)
           (cauchy-as (suc p) n k1 (ℕ.m⊔n≤o⇒m≤o k1 k2 n≥k ) (ℕ.≤-reflexive refl))
           {!!}
           {!!}
+          !}
     where
     k1 = M (suc p)
     k2 = N (suc p)
