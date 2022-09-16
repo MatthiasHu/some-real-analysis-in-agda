@@ -86,6 +86,14 @@ Positive-½ = tt
   1ℚ * ½ ^ p             ≡⟨ *-identityˡ (½ ^ p) ⟩
   ½ ^ p                  ∎
 
+½^sucp<½^p : (p : ℕ) → ½ ^ suc p < ½ ^ p
+½^sucp<½^p p =
+  begin-strict
+  ½ ^ suc p              ≡˘⟨ +-identityˡ _ ⟩
+  0ℚ        + ½ ^ suc p  <⟨ +-monoˡ-< (½ ^ suc p) (0ℚ<½^p (suc p)) ⟩
+  ½ ^ suc p + ½ ^ suc p  ≡⟨ ½^sucp+½^sucp≡½^p p ⟩
+  ½ ^ p                  ∎
+
 
 --- archimedian properties ---
 
@@ -96,7 +104,27 @@ archimedian-ε : (a : ℚ) → Positive a → Σ ℕ (λ p → ½ ^ p < a)
 archimedian-ε = {!!}
 
 
---- in relation to triangle inequality ---
+--- on absolute value ---
+
+≤∣-∣ : (a : ℚ) → a ≤ ∣ a ∣
+≤∣-∣ a = case ∣p∣≡p∨∣p∣≡-p a of λ
+  { (inj₁ ∣a∣≡a) → ≤-reflexive (sym ∣a∣≡a)
+  ; (inj₂ ∣a∣≡-a) →
+      begin
+      a        ≡⟨ sym (neg-neg a) ⟩
+      - (- a)  ≡˘⟨ cong -_ ∣a∣≡-a ⟩
+      - ∣ a ∣  ≤⟨ neg-antimono-≤ (0≤∣p∣ a) ⟩
+      0ℚ       ≤⟨ 0≤∣p∣ a ⟩
+      ∣ a ∣    ∎
+  }
+
+-∣-∣≤ : (a : ℚ) → - ∣ a ∣ ≤ a
+-∣-∣≤ a =
+  begin
+  - ∣ a ∣    ≡˘⟨ cong -_ (∣-p∣≡∣p∣ a) ⟩
+  - ∣ - a ∣  ≤⟨ neg-antimono-≤ (≤∣-∣ (- a)) ⟩
+  - (- a)    ≡⟨ neg-neg a ⟩
+  a          ∎
 
 ∣a-b∣≡∣b-a∣ : (a b : ℚ) → ∣ a - b ∣ ≡ ∣ b - a ∣
 ∣a-b∣≡∣b-a∣ a b =
@@ -104,6 +132,9 @@ archimedian-ε = {!!}
   ∣ a - b ∣          ≡⟨ sym (∣-p∣≡∣p∣ (a - b)) ⟩
   ∣ - (a - b) ∣      ≡⟨ cong ∣_∣ (neg-diff a b) ⟩
   ∣ b - a ∣          ∎
+
+
+--- in relation to triangle inequality ---
 
 difference-of-sums :
   (a b a' b' : ℚ) →
@@ -118,12 +149,18 @@ difference-of-sums a b a' b' =
   ((a - a') + b) - b'     ≡⟨ +-assoc (a - a') b (- b') ⟩
   (a - a') + (b - b')     ∎
 
+subtract-add-lemma : (a b : ℚ) → (a - b) + b ≡ a
+subtract-add-lemma a b =
+  begin-equality
+  ((a - b) + b)    ≡⟨ +-assoc a (- b) b ⟩
+  (a + (- b + b))  ≡⟨ cong (a +_) (+-inverseˡ b) ⟩
+  (a + 0ℚ)         ≡⟨ +-identityʳ a ⟩
+  a                ∎
+
 insert-lemma : (a b c : ℚ) → a - c ≡ (a - b) + (b - c)
 insert-lemma a b c =
   begin-equality
-  a - c                 ≡˘⟨ cong (_- c) (+-identityʳ a) ⟩
-  (a + 0ℚ) - c          ≡˘⟨ cong (λ z → (a + z) - c) (+-inverseˡ b) ⟩
-  (a + (- b + b)) - c   ≡˘⟨ cong (_- c) (+-assoc a (- b) b) ⟩
+  a - c                 ≡˘⟨ cong (_- c) (subtract-add-lemma a b) ⟩
   ((a - b) + b) - c     ≡⟨ +-assoc (a - b) b (- c) ⟩
   (a - b) + (b - c)     ∎
 

@@ -6,7 +6,7 @@ module real where
 
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 import Data.Nat.Properties as ℕ
-open import Data.Rational as ℚ using (ℚ; ½; 0ℚ)
+open import Data.Rational as ℚ using (ℚ; ½; -½; 0ℚ; 1ℚ)
 import Data.Rational.Properties as ℚ
 open import Data.Product
 open import Data.Sum
@@ -127,6 +127,45 @@ nneg (realConstr as M cauchy) = (p : ℕ) → ℚ.- (½ ^ p) ℚ.≤ as (M p)
 pos : ℝ → Set
 pos (realConstr as M cauchy) = Σ ℕ (λ p → ½ ^ p ℚ.≤ as (M (suc p)))
 
+module pos-Characterizations
+  (x@(realConstr as M cauchy) : ℝ)
+  where
+
+  EpsilonAndIndexBound : Set
+  EpsilonAndIndexBound = Σ ℕ (λ p → Σ ℕ (λ k → (n : ℕ) → n ℕ.≥ k → as n ℚ.≥ ½ ^ p))
+
+  StrictEpsilonAndIndexBound : Set
+  StrictEpsilonAndIndexBound = Σ ℕ (λ p → Σ ℕ (λ k → (n : ℕ) → n ℕ.≥ k → as n ℚ.> ½ ^ p))
+
+  StrictEpsilonAndIndexBound→EpsilonAndIndexBound :
+    StrictEpsilonAndIndexBound → EpsilonAndIndexBound
+  StrictEpsilonAndIndexBound→EpsilonAndIndexBound (p , k , as>½^p) =
+      p , k , λ n n≥k → ℚ.<⇒≤ (as>½^p n n≥k)
+
+  EpsilonAndIndexBound→StrictEpsilonAndIndexBound :
+    EpsilonAndIndexBound → StrictEpsilonAndIndexBound
+  EpsilonAndIndexBound→StrictEpsilonAndIndexBound (p , k , as≥½^p) =
+    suc p , k , λ n n≥k → ℚ.<-≤-trans (½^sucp<½^p p) (as≥½^p n n≥k)
+
+  pos→EpsilonAndIndexBound : pos x → EpsilonAndIndexBound
+  pos→EpsilonAndIndexBound (p , ½^p≤asMsucp) =
+    let k = M (suc p)
+    in
+    suc p , k , λ n n≥k →
+    begin
+    ½ ^ suc p                           ≡⟨ cong (ℚ._* (½ ^ p)) (refl {x = ½}) ⟩
+    (-½ ℚ.+ 1ℚ) ℚ.* ½ ^ p               ≡⟨ ℚ.*-distribʳ-+ (½ ^ p) -½ 1ℚ ⟩
+    -½ ℚ.* ½ ^ p ℚ.+ 1ℚ ℚ.* ½ ^ p       ≡⟨ cong₂ ℚ._+_ (sym (ℚ.neg-distribˡ-* ½ (½ ^ p))) (ℚ.*-identityˡ (½ ^ p)) ⟩
+    ℚ.- ½ ^ suc p           ℚ.+ ½ ^ p   ≤⟨ ℚ.+-mono-≤ (ℚ.neg-antimono-≤ (cauchy (suc p) n k n≥k ℕ.≤-refl))
+                                                        ½^p≤asMsucp ⟩
+    ℚ.- ℚ.∣ as n ℚ.- as k ∣ ℚ.+ as k    ≤⟨ ℚ.+-monoˡ-≤ (as k) (-∣-∣≤ (as n ℚ.- as k)) ⟩
+           (as n ℚ.- as k)  ℚ.+ as k    ≡⟨ subtract-add-lemma (as n) (as k) ⟩
+    as n                                ∎
+    where
+    open ℚ.≤-Reasoning
+
+-- nneg-pos : (x : ℝ) → nneg x
+
 
 --- arithmetic operations ---
 
@@ -175,13 +214,18 @@ x ≤ y = nneg (y - x)
 
 --- approxSplit ---
 
-approxSplit : (x y z : ℝ) → x < y → (z ≤ y) ⊎ (x ≤ z)
-approxSplit (realConstr as M cauchy) (realConstr bs N cauchy₁) (realConstr cs L cauchy₂) (p , snd) =
+approxSplit : (x y z : ℝ) → x < y → (z < y) ⊎ (x < z)
+approxSplit
+  (realConstr as M as-cauchy)
+  (realConstr bs N bs-cauchy)
+  (realConstr cs L cs-cauchy)
+  (p , snd)
+  =
   let n = N (suc (suc p)) ℕ.⊔ M (suc (suc p))
       m = n ℕ.⊔ L (suc (suc p))
   in
   case (cs m ℚ.≤? ½ ℚ.* (as n ℚ.+ bs n)) of λ
-    { (yes ineq) → inj₁ (λ p₁ → {!!})
+    { (yes ineq) → inj₁ {!!}
     ; (no ¬p) → inj₂ {!!}
     }
 
