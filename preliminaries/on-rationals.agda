@@ -86,6 +86,15 @@ Positive-½ = tt
   1ℚ * ½ ^ p             ≡⟨ *-identityˡ (½ ^ p) ⟩
   ½ ^ p                  ∎
 
+½^p-½^sucp≡½^sucp : (p : ℕ) → ½ ^ p - ½ ^ (suc p) ≡ ½ ^ (suc p)
+½^p-½^sucp≡½^sucp p =
+  begin-equality
+  ½ ^ p - ½ ^ suc p        ≡⟨ cong₂ _+_ (sym (*-identityˡ (½ ^ p))) (neg-distribˡ-* ½ (½ ^ p)) ⟩
+  1ℚ * ½ ^ p + -½ * ½ ^ p  ≡˘⟨ *-distribʳ-+ (½ ^ p) 1ℚ -½ ⟩
+  (1ℚ + -½) * ½ ^ p        ≡⟨ cong (_* (½ ^ p)) (refl {x = ½}) ⟩
+  ½ ^ suc p
+  ∎
+
 ½^sucp<½^p : (p : ℕ) → ½ ^ suc p < ½ ^ p
 ½^sucp<½^p p =
   begin-strict
@@ -157,6 +166,13 @@ subtract-add-lemma a b =
   (a + 0ℚ)         ≡⟨ +-identityʳ a ⟩
   a                ∎
 
+add-difference-lemma : (a b : ℚ) → a + (b - a) ≡ b
+add-difference-lemma a b =
+  begin-equality
+  a + (b - a)   ≡⟨ +-comm a (b - a) ⟩
+  (b - a) + a   ≡⟨ subtract-add-lemma b a ⟩
+  b             ∎
+
 insert-lemma : (a b c : ℚ) → a - c ≡ (a - b) + (b - c)
 insert-lemma a b c =
   begin-equality
@@ -196,13 +212,13 @@ dist-interval a c b b' (a≤b , b≤c) (a≤b' , b'≤c) =
   case ∣p∣≡p∨∣p∣≡-p (b - b') of λ
     { (inj₁ ∣∣≡) →
         begin
-        ∣ b - b' ∣  ≡⟨ ∣∣≡ ⟩
-        b - b'      ≤⟨ +-mono-≤ b≤c (neg-antimono-≤ a≤b') ⟩
-        c - a       ∎
+        ∣ b - b' ∣    ≡⟨ ∣∣≡ ⟩
+        b - b'        ≤⟨ +-mono-≤ b≤c (neg-antimono-≤ a≤b') ⟩
+        c - a         ∎
     ; (inj₂ ∣∣≡-) →
         begin
-        ∣ b - b' ∣          ≡⟨ ∣∣≡- ⟩
-        - (b - b')          ≡⟨ neg-diff b b' ⟩
-        b' - b              ≤⟨ +-mono-≤ b'≤c (neg-antimono-≤ a≤b) ⟩
-        c - a               ∎
+        ∣ b - b' ∣    ≡⟨ ∣∣≡- ⟩
+        - (b - b')    ≡⟨ neg-diff b b' ⟩
+        b' - b        ≤⟨ +-mono-≤ b'≤c (neg-antimono-≤ a≤b) ⟩
+        c - a         ∎
     }

@@ -29,10 +29,7 @@ module ConvexCombination
   convex-comb-1 =
     begin-equality
     c + 1ℚ * (d - c)  ≡⟨ cong (c +_) (*-identityˡ (d - c)) ⟩
-    c + (d - c)       ≡⟨ cong (c +_) (+-comm d (- c)) ⟩
-    c + ((- c) + d)   ≡˘⟨ +-assoc c (- c) d ⟩
-    (c - c) + d       ≡⟨ cong (_+ d) (+-inverseʳ c) ⟩
-    0ℚ + d            ≡⟨ +-identityˡ d  ⟩
+    c + (d - c)       ≡⟨ add-difference-lemma c d ⟩
     d                 ∎
 
   d-c-Positive : Positive (d - c)

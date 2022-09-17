@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+-- {-# OPTIONS --allow-unsolved-metas #-}
 
 module real where
 
@@ -131,6 +131,9 @@ module pos-Characterizations
   (x@(realConstr as M cauchy) : ℝ)
   where
 
+  open ℚ.≤-Reasoning
+
+  -- A real number is positive iff its approximations are eventually ≥ some fixed epsilon.
   EpsilonAndIndexBound : Set
   EpsilonAndIndexBound = Σ ℕ (λ p → Σ ℕ (λ k → (n : ℕ) → n ℕ.≥ k → as n ℚ.≥ ½ ^ p))
 
@@ -153,18 +156,32 @@ module pos-Characterizations
     in
     suc p , k , λ n n≥k →
     begin
-    ½ ^ suc p                           ≡⟨ cong (ℚ._* (½ ^ p)) (refl {x = ½}) ⟩
-    (-½ ℚ.+ 1ℚ) ℚ.* ½ ^ p               ≡⟨ ℚ.*-distribʳ-+ (½ ^ p) -½ 1ℚ ⟩
-    -½ ℚ.* ½ ^ p ℚ.+ 1ℚ ℚ.* ½ ^ p       ≡⟨ cong₂ ℚ._+_ (sym (ℚ.neg-distribˡ-* ½ (½ ^ p))) (ℚ.*-identityˡ (½ ^ p)) ⟩
-    ℚ.- ½ ^ suc p           ℚ.+ ½ ^ p   ≤⟨ ℚ.+-mono-≤ (ℚ.neg-antimono-≤ (cauchy (suc p) n k n≥k ℕ.≤-refl))
-                                                        ½^p≤asMsucp ⟩
-    ℚ.- ℚ.∣ as n ℚ.- as k ∣ ℚ.+ as k    ≤⟨ ℚ.+-monoˡ-≤ (as k) (-∣-∣≤ (as n ℚ.- as k)) ⟩
-           (as n ℚ.- as k)  ℚ.+ as k    ≡⟨ subtract-add-lemma (as n) (as k) ⟩
-    as n                                ∎
-    where
-    open ℚ.≤-Reasoning
+    ½ ^ suc p                      ≡˘⟨ ½^p-½^sucp≡½^sucp p ⟩
+    ½ ^ p ℚ.- ½ ^ suc p            ≤⟨ ℚ.+-mono-≤ ½^p≤asMsucp
+                                                 (ℚ.neg-antimono-≤ (cauchy (suc p) n k n≥k ℕ.≤-refl)) ⟩
+    as k  ℚ.- ℚ.∣ as n ℚ.- as k ∣  ≤⟨ ℚ.+-monoʳ-≤ (as k) (-∣-∣≤ (as n ℚ.- as k)) ⟩
+    as k  ℚ.+ (as n ℚ.- as k)      ≡⟨ add-difference-lemma (as k) (as n) ⟩
+    as n                           ∎
 
--- nneg-pos : (x : ℝ) → nneg x
+  EpsilonAndIndexBound→pos : EpsilonAndIndexBound → pos x
+  EpsilonAndIndexBound→pos (p , k , asn≥½^p) =
+    let n₀ = M (suc (suc p))
+        n = n₀ ℕ.⊔ k
+        n₀≥n₀ = ℕ.≤-refl {x = n₀}
+        n≥n₀ = ℕ.m≤m⊔n n₀ k
+        n≥k = ℕ.m≤n⊔m n₀ k
+    in
+    suc p , (
+    begin
+    ½ ^ suc p                       ≡˘⟨ ½^p-½^sucp≡½^sucp p ⟩
+    ½ ^ p ℚ.- (½ ^ suc p)           <⟨ ℚ.+-monoʳ-< (½ ^ p) (ℚ.neg-antimono-< (½^sucp<½^p (suc p))) ⟩
+    ½ ^ p ℚ.- (½ ^ suc (suc p))     ≤⟨ ℚ.+-mono-≤ (asn≥½^p n n≥k)
+                                                  (ℚ.neg-antimono-≤ (cauchy (suc (suc p)) n₀ n n₀≥n₀ n≥n₀)) ⟩
+    as n  ℚ.- ℚ.∣ as n₀ ℚ.- as n ∣  ≤⟨ ℚ.+-monoʳ-≤ (as n) (-∣-∣≤ (as n₀ ℚ.- as n)) ⟩
+    as n  ℚ.+    (as n₀ ℚ.- as n)   ≡⟨ add-difference-lemma (as n) (as n₀) ⟩
+    as n₀                           ∎ )
+
+-- TODO: nneg vs pos
 
 
 --- arithmetic operations ---
