@@ -225,6 +225,40 @@ x - y = x + (- y)
 _<_ : ℝ → ℝ → Set
 x < y = pos (y - x)
 
+module <-Characterizations
+  (x@(realConstr as M as-cauchy) : ℝ)
+  (y@(realConstr bs N bs-cauchy) : ℝ)
+  where
+
+  open pos-Characterizations
+  open ℚ.≤-Reasoning
+
+  -- Two real numbers are apart from each other iff their approximations can
+  -- eventually be separated by a fixed interval.
+  IntervalAndIndexBound : Set
+  IntervalAndIndexBound =
+    Σ ℚ (λ a → Σ ℚ (λ b → a ℚ.< b × Σ ℕ (λ k → (n : ℕ) → n ℕ.≥ k → as n ℚ.≤ a × b ℚ.≤ bs n)))
+
+  <→IntervalAndIndexBound : x < y → IntervalAndIndexBound
+  <→IntervalAndIndexBound =
+    {!!}
+
+  IntervalAndIndexBound→< : IntervalAndIndexBound → x < y
+  IntervalAndIndexBound→< (a , b , a<b , k , as≤a×b≤bs) =
+    let b-a>0 = begin-strict
+                0ℚ       ≡˘⟨ ℚ.+-inverseʳ a ⟩
+                a ℚ.- a  <⟨ ℚ.+-monoˡ-< (ℚ.- a) a<b ⟩
+                b ℚ.- a  ∎
+        (p , ½^p<b-a) = archimedian-ε (b ℚ.- a) (ℚ.positive b-a>0)
+    in
+    EpsilonAndIndexBound→pos (y - x) (p , k , (λ n n≥k →
+      begin
+      ½ ^ p          <⟨ ½^p<b-a ⟩
+      b ℚ.- a        ≤⟨( let (asn≤a , b≤bsn) = as≤a×b≤bs n n≥k
+                         in ℚ.+-mono-≤ b≤bsn (ℚ.neg-antimono-≤ asn≤a) )⟩
+      bs n ℚ.- as n  ∎
+      ))
+
 _≤_ : ℝ → ℝ → Set
 x ≤ y = nneg (y - x)
 
