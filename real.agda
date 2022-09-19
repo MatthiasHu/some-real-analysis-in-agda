@@ -308,6 +308,16 @@ x ≤ y = nneg (y - x)
 
 --- approxSplit ---
 
+approxSplitStrict : (x y z : ℝ) → x < y → (z < y) ⊎ (x < z)
+approxSplitStrict
+  x@(realConstr as M as-cauchy)
+  y@(realConstr bs N bs-cauchy)
+  z@(realConstr cs L cs-cauchy)
+  x<y
+  =
+  {!!}
+  where
+
 approxSplit : (x y z : ℝ) → x < y → (z < y) ⊎ (x < z)
 approxSplit
   (realConstr as M as-cauchy)
