@@ -13,7 +13,7 @@ open import Data.Sum
 open import Relation.Binary.PropositionalEquality
 open import Data.Bool using (true; false)
 
-open import Function.Base using (case_of_)
+open import Function.Base using (case_of_; _∘′_)
 open import Relation.Nullary
 
 open import Algebra.Bundles using (module Ring)
@@ -181,6 +181,14 @@ module pos-Characterizations
     as n  ℚ.+    (as n₀ ℚ.- as n)   ≡⟨ add-difference-lemma (as n) (as n₀) ⟩
     as n₀                           ∎ )
 
+  pos→StrictEpsilonAndIndexBound =
+       EpsilonAndIndexBound→StrictEpsilonAndIndexBound
+    ∘′ pos→EpsilonAndIndexBound
+
+  StrictEpsilonAndIndexBound→pos =
+       EpsilonAndIndexBound→pos
+    ∘′ StrictEpsilonAndIndexBound→EpsilonAndIndexBound
+
 -- TODO: nneg vs pos
 
 
@@ -230,7 +238,7 @@ module <-Characterizations
   (y@(realConstr bs N bs-cauchy) : ℝ)
   where
 
-  open pos-Characterizations
+  open pos-Characterizations (y - x)
   open ℚ.≤-Reasoning
 
   -- Two real numbers are apart from each other iff their approximations can
@@ -240,18 +248,53 @@ module <-Characterizations
     Σ ℚ (λ a → Σ ℚ (λ b → a ℚ.< b × Σ ℕ (λ k → (n : ℕ) → n ℕ.≥ k → as n ℚ.≤ a × b ℚ.≤ bs n)))
 
   <→IntervalAndIndexBound : x < y → IntervalAndIndexBound
-  <→IntervalAndIndexBound =
-    {!!}
+  <→IntervalAndIndexBound x<y =
+    let
+    (p , k , bs-as>½^p) = pos→StrictEpsilonAndIndexBound x<y
+    p' = suc p
+    k' = k ℕ.⊔ (M p' ℕ.⊔ N p')
+    k'≥k = ℕ.m≤m⊔n k (M p' ℕ.⊔ N p')
+    k'≥Mp' : k' ℕ.≥ M p'
+    k'≥Mp' = ℕ.≤-trans (ℕ.m≤m⊔n (M p') (N p')) (ℕ.m≤n⊔m k (M p' ℕ.⊔ N p'))
+    k'≥Np' = ℕ.≤-trans (ℕ.m≤n⊔m (M p') (N p')) (ℕ.m≤n⊔m k (M p' ℕ.⊔ N p'))
+    a = as k' ℚ.+ ½ ^ p'
+    b = bs k' ℚ.- ½ ^ p'
+    a<b = begin-strict
+          a                                        ≡⟨⟩
+          as k' ℚ.+ ½ ^ p'                         ≡˘⟨ cong (as k' ℚ.+_) (½^p-½^sucp≡½^sucp p) ⟩
+          as k' ℚ.+ (½ ^ p ℚ.- ½ ^ p')             ≡˘⟨ ℚ.+-assoc (as k') (½ ^ p) (ℚ.- ½ ^ p') ⟩
+          as k' ℚ.+ ½ ^ p ℚ.- ½ ^ p'               <⟨ ℚ.+-monoˡ-< (ℚ.- ½ ^ p') (ℚ.+-monoʳ-< (as k')
+                                                        (bs-as>½^p k' k'≥k)) ⟩
+          as k' ℚ.+ (bs k' ℚ.- as k') ℚ.- ½ ^ p'   ≡⟨ cong (ℚ._- ½ ^ p') (add-difference-lemma (as k') (bs k')) ⟩
+          bs k' ℚ.- ½ ^ p'                         ≡⟨⟩
+          b                                        ∎
+    in
+    a , b , a<b , k' , (λ n n≥k' →
+      (begin
+      as n                            ≡˘⟨ add-difference-lemma (as k') (as n) ⟩
+      as k' ℚ.+ (as n ℚ.- as k')      ≤⟨ ℚ.+-monoʳ-≤ (as k') (≤∣-∣ (as n ℚ.- as k'))  ⟩
+      as k' ℚ.+ ℚ.∣ as n ℚ.- as k' ∣  ≤⟨ ℚ.+-monoʳ-≤ (as k')
+                                           (as-cauchy p' n k' (ℕ.≤-trans k'≥Mp' n≥k') k'≥Mp') ⟩
+      as k' ℚ.+ ½ ^ p'                ≡⟨⟩
+      a                               ∎)
+    , (begin
+      b                               ≡⟨⟩
+      bs k' ℚ.- ½ ^ p'                ≤⟨ ℚ.+-monoʳ-≤ (bs k') (ℚ.neg-antimono-≤
+                                           (bs-cauchy p' n k' (ℕ.≤-trans k'≥Np' n≥k') k'≥Np')) ⟩
+      bs k' ℚ.- ℚ.∣ bs n ℚ.- bs k' ∣  ≤⟨ ℚ.+-monoʳ-≤ (bs k') (-∣-∣≤ ((bs n ℚ.- bs k'))) ⟩
+      bs k' ℚ.+ (bs n ℚ.- bs k')      ≡⟨ add-difference-lemma (bs k') (bs n) ⟩
+      bs n                            ∎))
 
   IntervalAndIndexBound→< : IntervalAndIndexBound → x < y
   IntervalAndIndexBound→< (a , b , a<b , k , as≤a×b≤bs) =
-    let b-a>0 = begin-strict
-                0ℚ       ≡˘⟨ ℚ.+-inverseʳ a ⟩
-                a ℚ.- a  <⟨ ℚ.+-monoˡ-< (ℚ.- a) a<b ⟩
-                b ℚ.- a  ∎
-        (p , ½^p<b-a) = archimedian-ε (b ℚ.- a) (ℚ.positive b-a>0)
+    let
+    b-a>0 = begin-strict
+            0ℚ       ≡˘⟨ ℚ.+-inverseʳ a ⟩
+            a ℚ.- a  <⟨ ℚ.+-monoˡ-< (ℚ.- a) a<b ⟩
+            b ℚ.- a  ∎
+    (p , ½^p<b-a) = archimedian-ε (b ℚ.- a) (ℚ.positive b-a>0)
     in
-    EpsilonAndIndexBound→pos (y - x) (p , k , (λ n n≥k →
+    EpsilonAndIndexBound→pos (p , k , (λ n n≥k →
       begin
       ½ ^ p          <⟨ ½^p<b-a ⟩
       b ℚ.- a        ≤⟨( let (asn≤a , b≤bsn) = as≤a×b≤bs n n≥k
