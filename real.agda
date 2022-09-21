@@ -21,6 +21,10 @@ open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
 open import preliminaries.on-rationals
 
+-- open import Equality.Propositional
+-- open import Erased.With-K
+
+
 
 --- Cauchy sequence property ---
 
@@ -39,6 +43,7 @@ record ℝ : Set where
   field
     as : ℕ → ℚ
     M : ℕ → ℕ
+--    @0 cauchy : Cauchy as M
     cauchy : Cauchy as M
     -- Should we require M to be monotonous?
 
@@ -163,6 +168,7 @@ module pos-Characterizations
     as k  ℚ.+ (as n ℚ.- as k)      ≡⟨ add-difference-lemma (as k) (as n) ⟩
     as n                           ∎
 
+{-
   EpsilonAndIndexBound→pos : EpsilonAndIndexBound → pos x
   EpsilonAndIndexBound→pos (p , k , asn≥½^p) =
     let n₀ = M (suc (suc p))
@@ -349,3 +355,5 @@ fromℚ-preserves-< a b a<b = fromℚ-preserves-pos (b ℚ.- a) (ℚ.positive (
   b ℚ.- a   ∎))
   where
   open ℚ.≤-Reasoning
+
+-}
