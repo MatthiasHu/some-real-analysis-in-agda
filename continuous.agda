@@ -22,6 +22,7 @@ open import real as ℝ using (ℝ; Cauchy; 0ℝ; _≃_; fromℚ; approxSplit; f
 open import preliminaries.on-rationals
 open import preliminaries.convex-combination
 
+open import Erased.With-K
 
 
 --- definition of continuous functions ---
@@ -122,7 +123,7 @@ module IVT
     field
       c : ℚ
       d : ℚ
-      cd-correct : correct c d
+      @0 cd-correct : correct c d
 
   module Step
     (correct-cd : correct-pair)
@@ -142,25 +143,32 @@ module IVT
           )
 
       field
-        c-mono : c ℚ.≤ c'
-        d-mono : d' ℚ.≤ d
-        cd-dist : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
+        @0 c-mono : c ℚ.≤ c'
+        @0 d-mono : d' ℚ.≤ d
+        @0 cd-dist : d' ℚ.- c' ≡ 2/3 ℚ.* (d ℚ.- c)
 
-    open correct cd-correct
+    -- We can not simply open the erased cd-correct here, unfortunately.
+    @0 c<d : c ℚ.< d
+    c<d = correct.c<d cd-correct
+    @0 fc≤0 : capp f (fromℚ c) ℝ.≤ 0ℝ
+    fc≤0 = correct.fc≤0 cd-correct
+    @0 0≤fd : 0ℝ ℝ.≤ capp f (fromℚ d)
+    0≤fd = correct.0≤fd cd-correct
+
     open ConvexCombination c d c<d
 
     c₀ = convex-comb 1/3
     d₀ = convex-comb 2/3
 
-    c₀<d₀ : c₀ ℚ.< d₀
+    @0 c₀<d₀ : c₀ ℚ.< d₀
     c₀<d₀ = convex-comb-mono 1/3 2/3 (from-yes (1/3 ℚ.<? 2/3))
-    c<c₀ : c ℚ.< c₀
+    @0 c<c₀ : c ℚ.< c₀
     c<c₀ = convex-comb-mono-0 1/3 (from-yes (0ℚ ℚ.<? 1/3))
-    c<d₀ : c ℚ.< d₀
+    @0 c<d₀ : c ℚ.< d₀
     c<d₀ = convex-comb-mono-0 2/3 (from-yes (0ℚ ℚ.<? 2/3))
-    c₀<d : c₀ ℚ.< d
+    @0 c₀<d : c₀ ℚ.< d
     c₀<d = convex-comb-mono-1 1/3 (from-yes (1/3 ℚ.<? 1ℚ))
-    d₀<d : d₀ ℚ.< d
+    @0 d₀<d : d₀ ℚ.< d
     d₀<d = convex-comb-mono-1 2/3 (from-yes (2/3 ℚ.<? 1ℚ))
 
     split : 0ℝ ℝ.≤ capp f (fromℚ d₀) ⊎ capp f (fromℚ c₀) ℝ.≤ 0ℝ
@@ -212,8 +220,8 @@ module IVT
 
   module Iteration
     (a b : ℚ)
-    (ab-correct : correct a b)
-    (b-a≤1 : b ℚ.- a ℚ.≤ 1ℚ)
+    (@0 ab-correct : correct a b)
+    (@0 b-a≤1 : b ℚ.- a ℚ.≤ 1ℚ)
     where
 
     open ℚ.≤-Reasoning
@@ -243,7 +251,7 @@ module IVT
     ds : ℕ → ℚ
     ds n = correct-pair.d (correct-cds n)
 
-    cds-correct : (n : ℕ) → correct (cs n) (ds n)
+    @0 cds-correct : (n : ℕ) → correct (cs n) (ds n)
     cds-correct n = correct-pair.cd-correct (correct-cds n)
 
     module _
@@ -252,16 +260,16 @@ module IVT
 
       open Step.conclusion (step-conclusions n)
 
-      cs-mono-suc : cs n ℚ.≤ cs (suc n)
+      @0 cs-mono-suc : cs n ℚ.≤ cs (suc n)
       cs-mono-suc = c-mono
 
-      ds-mono-suc : ds (suc n) ℚ.≤ ds n
+      @0 ds-mono-suc : ds (suc n) ℚ.≤ ds n
       ds-mono-suc = d-mono
 
-      cds-dist-suc : (ds (suc n)) ℚ.- (cs (suc n)) ≡ 2/3 ℚ.* (ds n ℚ.- cs n)
+      @0 cds-dist-suc : (ds (suc n)) ℚ.- (cs (suc n)) ≡ 2/3 ℚ.* (ds n ℚ.- cs n)
       cds-dist-suc = cd-dist
 
-    cds-dist : (k : ℕ) → ds k ℚ.- cs k ≡ (2/3 ^ k) ℚ.* (b ℚ.- a)
+    @0 cds-dist : (k : ℕ) → ds k ℚ.- cs k ≡ (2/3 ^ k) ℚ.* (b ℚ.- a)
     cds-dist zero =
       begin-equality
       ds zero ℚ.- cs zero           ≡⟨ refl ⟩
@@ -276,7 +284,7 @@ module IVT
       (2/3 ℚ.* 2/3 ^ k) ℚ.* (b ℚ.- a)  ≡⟨ refl ⟩
       2/3 ^ (suc k) ℚ.* (b ℚ.- a)      ∎
 
-    cs-mono : (k n : ℕ) → (k ℕ.≤ n) → (cs k ℚ.≤ cs n)
+    @0 cs-mono : (k n : ℕ) → (k ℕ.≤ n) → (cs k ℚ.≤ cs n)
     cs-mono k n k≤n = subst (λ n' → cs k ℚ.≤ cs n') (ℕ.m∸n+n≡m k≤n) (helper (n ℕ.∸ k) )
       where
       helper : (diff : ℕ) → cs k ℚ.≤ cs (diff ℕ.+ k)
@@ -287,7 +295,7 @@ module IVT
         cs (diff ℕ.+ k)      ≤⟨ cs-mono-suc (diff ℕ.+ k) ⟩
         cs (suc diff ℕ.+ k)  ∎
 
-    ds-mono : (k n : ℕ) → (k ℕ.≤ n) → (ds n ℚ.≤ ds k)
+    @0 ds-mono : (k n : ℕ) → (k ℕ.≤ n) → (ds n ℚ.≤ ds k)
     ds-mono k n k≤n =  subst (λ n' → ds n' ℚ.≤ ds k) (ℕ.m∸n+n≡m k≤n) (helper (n ℕ.∸ k) )
       where
       helper : (diff : ℕ) → ds (diff ℕ.+ k) ℚ.≤ ds k
@@ -298,7 +306,7 @@ module IVT
         ds (diff ℕ.+ k)       ≤⟨  helper diff  ⟩
         ds k                  ∎
 
-    cs<ds : (n m : ℕ) → cs n ℚ.< ds m
+    @0 cs<ds : (n m : ℕ) → cs n ℚ.< ds m
     cs<ds n m =
       let n⊔m = n ℕ.⊔ m
       in
@@ -308,17 +316,17 @@ module IVT
       ds n⊔m  ≤⟨ ds-mono m n⊔m (ℕ.m≤n⊔m n m) ⟩
       ds m    ∎
 
-    cs∈[cs,ds] : {k n : ℕ} → (k ℕ.≤ n) → cs n ∈[ cs k , ds k ]
+    @0 cs∈[cs,ds] : {k n : ℕ} → (k ℕ.≤ n) → cs n ∈[ cs k , ds k ]
     cs∈[cs,ds] {k} {n} k≤n =
         cs-mono k n k≤n
       , ℚ.<⇒≤ (cs<ds n k)
 
-    ds∈[cs,ds] : {k n : ℕ} → (k ℕ.≤ n) → ds n ∈[ cs k , ds k ]
+    @0 ds∈[cs,ds] : {k n : ℕ} → (k ℕ.≤ n) → ds n ∈[ cs k , ds k ]
     ds∈[cs,ds] {k} {n} k≤n =
         ℚ.<⇒≤ (cs<ds k n)
       , ds-mono k n k≤n
 
-    cauchy-helper :
+    @0 cauchy-helper :
       (k : ℕ) →
       (n m : ℕ) →
       (n ℕ.≥ k) → (m ℕ.≥ k) →
@@ -349,5 +357,5 @@ module IVT
       4/9≤½ : 2/3 ^ 2 ℚ.≤ ½
       4/9≤½ = from-yes (2/3 ^ 2 ℚ.≤? ½)
 
-    IVT : Σ ℝ (λ x → capp f x ≃ 0ℝ)
+    IVT : Σ ℝ (λ x → Erased (capp f x ≃ 0ℝ))
     IVT = x , {!!}

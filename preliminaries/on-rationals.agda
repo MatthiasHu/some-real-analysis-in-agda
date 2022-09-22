@@ -23,6 +23,8 @@ open import Agda.Builtin.Unit using (tt)
 
 open ≤-Reasoning
 
+open import Erased.With-K
+
 
 --- some more constants ---
 
@@ -109,7 +111,7 @@ Positive-½ = tt
 archimedian : (a : ℚ) → Σ ℕ (λ p → (ℤ.+ 2 / 1) ^ p > a)
 archimedian = {!!}
 
-archimedian-ε : (a : ℚ) → Positive a → Σ ℕ (λ p → ½ ^ p < a)
+archimedian-ε : (a : ℚ) → @0 Positive a → Σ ℕ (λ p → Erased (½ ^ p < a))
 archimedian-ε = {!!}
 
 

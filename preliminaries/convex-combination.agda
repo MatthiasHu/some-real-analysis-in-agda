@@ -10,7 +10,7 @@ open import preliminaries.on-rationals
 
 module ConvexCombination
   (c d : ℚ)
-  (c<d : c < d)
+  (@0 c<d : c < d)
   where
 
   open ≤-Reasoning
@@ -32,14 +32,14 @@ module ConvexCombination
     c + (d - c)       ≡⟨ add-difference-lemma c d ⟩
     d                 ∎
 
-  d-c-Positive : Positive (d - c)
+  @0 d-c-Positive : Positive (d - c)
   d-c-Positive = positive
     (begin-strict
     0ℚ       ≡˘⟨ +-inverseʳ c ⟩
     c - c    <⟨ +-monoˡ-< (- c) c<d ⟩
     d - c    ∎)
 
-  convex-comb-mono :
+  @0 convex-comb-mono :
     (t t' : ℚ) →
     t < t' →
     convex-comb t < convex-comb t'
@@ -49,14 +49,14 @@ module ConvexCombination
     t' * (d - c)   ∎
     )
 
-  convex-comb-mono-0 : (t : ℚ) → (0ℚ < t) → c < convex-comb t
+  @0 convex-comb-mono-0 : (t : ℚ) → (0ℚ < t) → c < convex-comb t
   convex-comb-mono-0 t 0<t =
     begin-strict
     c               ≡˘⟨ convex-comb-0 ⟩
     convex-comb 0ℚ  <⟨ convex-comb-mono 0ℚ t 0<t  ⟩
     convex-comb t   ∎
 
-  convex-comb-mono-1 : (t : ℚ) → (t < 1ℚ) → convex-comb t < d
+  @0 convex-comb-mono-1 : (t : ℚ) → (t < 1ℚ) → convex-comb t < d
   convex-comb-mono-1 t t<1 =
     begin-strict
     convex-comb t   <⟨ convex-comb-mono t 1ℚ t<1  ⟩

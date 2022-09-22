@@ -22,9 +22,7 @@ open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
 -- equality
 
--- Not used so far.
--- import Equality.Propositional
--- import Erased.With-K
+open import Erased.With-K
 
 -- ours
 
@@ -129,14 +127,13 @@ fromℚ : ℚ → ℝ
 --- basic predicates of real numbers ---
 
 nneg : ℝ → Set
-nneg (realConstr as M cauchy) = (p : ℕ) → ℚ.- (½ ^ p) ℚ.≤ as (M p)
+nneg (realConstr as M cauchy) = Erased ((p : ℕ) → ℚ.- (½ ^ p) ℚ.≤ as (M p))
 
 -- TODO: RealNNegChar
 
 pos : ℝ → Set
-pos (realConstr as M cauchy) = Σ ℕ (λ p → ½ ^ p ℚ.≤ as (M (suc p)))
+pos (realConstr as M cauchy) = Σ ℕ (λ p → Erased (½ ^ p ℚ.≤ as (M (suc p))))
 
-{-
 module pos-Characterizations
   (x@(realConstr as M cauchy) : ℝ)
   where
@@ -145,26 +142,26 @@ module pos-Characterizations
 
   -- A real number is positive iff its approximations are eventually ≥ some fixed epsilon.
   EpsilonAndIndexBound : Set
-  EpsilonAndIndexBound = Σ ℕ (λ p → Σ ℕ (λ k → (n : ℕ) → n ℕ.≥ k → as n ℚ.≥ ½ ^ p))
+  EpsilonAndIndexBound = Σ ℕ (λ p → Σ ℕ (λ k → Erased ((n : ℕ) → n ℕ.≥ k → as n ℚ.≥ ½ ^ p)))
 
   StrictEpsilonAndIndexBound : Set
-  StrictEpsilonAndIndexBound = Σ ℕ (λ p → Σ ℕ (λ k → (n : ℕ) → n ℕ.≥ k → as n ℚ.> ½ ^ p))
+  StrictEpsilonAndIndexBound = Σ ℕ (λ p → Σ ℕ (λ k → Erased ((n : ℕ) → n ℕ.≥ k → as n ℚ.> ½ ^ p)))
 
   StrictEpsilonAndIndexBound→EpsilonAndIndexBound :
     StrictEpsilonAndIndexBound → EpsilonAndIndexBound
-  StrictEpsilonAndIndexBound→EpsilonAndIndexBound (p , k , as>½^p) =
-      p , k , λ n n≥k → ℚ.<⇒≤ (as>½^p n n≥k)
+  StrictEpsilonAndIndexBound→EpsilonAndIndexBound (p , k , [ as>½^p ]) =
+      p , k , [( λ n n≥k → ℚ.<⇒≤ (as>½^p n n≥k) )]
 
   EpsilonAndIndexBound→StrictEpsilonAndIndexBound :
     EpsilonAndIndexBound → StrictEpsilonAndIndexBound
-  EpsilonAndIndexBound→StrictEpsilonAndIndexBound (p , k , as≥½^p) =
-    suc p , k , λ n n≥k → ℚ.<-≤-trans (½^sucp<½^p p) (as≥½^p n n≥k)
+  EpsilonAndIndexBound→StrictEpsilonAndIndexBound (p , k , [ as≥½^p ]) =
+    suc p , k , [(λ n n≥k → ℚ.<-≤-trans (½^sucp<½^p p) (as≥½^p n n≥k))]
 
   pos→EpsilonAndIndexBound : pos x → EpsilonAndIndexBound
-  pos→EpsilonAndIndexBound (p , ½^p≤asMsucp) =
+  pos→EpsilonAndIndexBound (p , [ ½^p≤asMsucp ]) =
     let k = M (suc p)
     in
-    suc p , k , λ n n≥k →
+    suc p , k , [(λ n n≥k →
     begin
     ½ ^ suc p                      ≡˘⟨ ½^p-½^sucp≡½^sucp p ⟩
     ½ ^ p ℚ.- ½ ^ suc p            ≤⟨ ℚ.+-mono-≤ ½^p≤asMsucp
@@ -172,16 +169,17 @@ module pos-Characterizations
     as k  ℚ.- ℚ.∣ as n ℚ.- as k ∣  ≤⟨ ℚ.+-monoʳ-≤ (as k) (-∣-∣≤ (as n ℚ.- as k)) ⟩
     as k  ℚ.+ (as n ℚ.- as k)      ≡⟨ add-difference-lemma (as k) (as n) ⟩
     as n                           ∎
+    )]
 
   EpsilonAndIndexBound→pos : EpsilonAndIndexBound → pos x
-  EpsilonAndIndexBound→pos (p , k , asn≥½^p) =
+  EpsilonAndIndexBound→pos (p , k , [ asn≥½^p ]) =
     let n₀ = M (suc (suc p))
         n = n₀ ℕ.⊔ k
         n₀≥n₀ = ℕ.≤-refl {x = n₀}
         n≥n₀ = ℕ.m≤m⊔n n₀ k
         n≥k = ℕ.m≤n⊔m n₀ k
     in
-    suc p , (
+    suc p , [(
     begin
     ½ ^ suc p                       ≡˘⟨ ½^p-½^sucp≡½^sucp p ⟩
     ½ ^ p ℚ.- (½ ^ suc p)           <⟨ ℚ.+-monoʳ-< (½ ^ p) (ℚ.neg-antimono-< (½^sucp<½^p (suc p))) ⟩
@@ -189,7 +187,7 @@ module pos-Characterizations
                                                   (ℚ.neg-antimono-≤ (cauchy (suc (suc p)) n₀ n n₀≥n₀ n≥n₀)) ⟩
     as n  ℚ.- ℚ.∣ as n₀ ℚ.- as n ∣  ≤⟨ ℚ.+-monoʳ-≤ (as n) (-∣-∣≤ (as n₀ ℚ.- as n)) ⟩
     as n  ℚ.+    (as n₀ ℚ.- as n)   ≡⟨ add-difference-lemma (as n) (as n₀) ⟩
-    as n₀                           ∎ )
+    as n₀                           ∎ )]
 
   pos→StrictEpsilonAndIndexBound =
        EpsilonAndIndexBound→StrictEpsilonAndIndexBound
@@ -198,7 +196,6 @@ module pos-Characterizations
   StrictEpsilonAndIndexBound→pos =
        EpsilonAndIndexBound→pos
     ∘′ StrictEpsilonAndIndexBound→EpsilonAndIndexBound
--}
 
 -- TODO: nneg vs pos
 
@@ -335,7 +332,7 @@ approxSplit
   (realConstr as M as-cauchy)
   (realConstr bs N bs-cauchy)
   (realConstr cs L cs-cauchy)
-  (p , snd)
+  (p , [ snd ])
   =
   let n = N (suc (suc p)) ℕ.⊔ M (suc (suc p))
       m = n ℕ.⊔ L (suc (suc p))
@@ -348,12 +345,12 @@ approxSplit
 
 --- compatibility of fromℚ with various operations ---
 
-fromℚ-preserves-pos : (a : ℚ) → ℚ.Positive a → pos (fromℚ a)
+fromℚ-preserves-pos : (a : ℚ) → @0 ℚ.Positive a → pos (fromℚ a)
 fromℚ-preserves-pos a a-positive =
-  let (p , ½^p<a) = archimedian-ε a a-positive
-  in p , ℚ.<⇒≤ ½^p<a
+  let (p , [ ½^p<a ]) = archimedian-ε a a-positive
+  in p , [ ℚ.<⇒≤ ½^p<a ]
 
-fromℚ-preserves-< : (a b : ℚ) → a ℚ.< b → fromℚ a < fromℚ b
+fromℚ-preserves-< : (a b : ℚ) → @0 a ℚ.< b → fromℚ a < fromℚ b
 fromℚ-preserves-< a b a<b = fromℚ-preserves-pos (b ℚ.- a) (ℚ.positive (
   begin-strict
   0ℚ        ≡˘⟨ ℚ.+-inverseʳ b ⟩

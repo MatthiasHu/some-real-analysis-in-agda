@@ -27,7 +27,7 @@ open import continuous
 x^2-2 : cont
 cont.h x^2-2 a p = a ^ 2 ℚ.- 2ℚ
 cont.α x^2-2 p = 0
-cont.ω x^2-2 = {!!}
+cont.ω x^2-2 p = zero -- Definitely wrong!!!
 cont.cauchy x^2-2 = {!!}
 cont.ucont x^2-2 = {!!}  -- Impossible for now.
 
