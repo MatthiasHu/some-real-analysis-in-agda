@@ -22,8 +22,9 @@ open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
 -- equality
 
-import Equality.Propositional
-import Erased.With-K
+-- Not used so far.
+-- import Equality.Propositional
+-- import Erased.With-K
 
 -- ours
 
