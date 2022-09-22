@@ -23,3 +23,10 @@ main = run (do
     ; nothing → putStrLn "Can't read this as a natural number."
     }
   )
+
+-- Performance notes for execution of the compiled program:
+-- n =  500 takes ca 0.5s
+-- n = 1000 takes ca 2s
+-- n = 1500 takes ca 5s
+-- n = 2000 takes ca 9s
+-- (This is ca 40x faster than evaluating by C-c C-n.)
