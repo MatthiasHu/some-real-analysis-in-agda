@@ -48,8 +48,7 @@ record ℝ : Set where
   field
     as : ℕ → ℚ
     M : ℕ → ℕ
---    @0 cauchy : Cauchy as M
-    cauchy : Cauchy as M
+    @0 cauchy : Cauchy as M
     -- Should we require M to be monotonous?
 
 
@@ -137,6 +136,7 @@ nneg (realConstr as M cauchy) = (p : ℕ) → ℚ.- (½ ^ p) ℚ.≤ as (M p)
 pos : ℝ → Set
 pos (realConstr as M cauchy) = Σ ℕ (λ p → ½ ^ p ℚ.≤ as (M (suc p)))
 
+{-
 module pos-Characterizations
   (x@(realConstr as M cauchy) : ℝ)
   where
@@ -198,6 +198,7 @@ module pos-Characterizations
   StrictEpsilonAndIndexBound→pos =
        EpsilonAndIndexBound→pos
     ∘′ StrictEpsilonAndIndexBound→EpsilonAndIndexBound
+-}
 
 -- TODO: nneg vs pos
 
@@ -243,6 +244,7 @@ x - y = x + (- y)
 _<_ : ℝ → ℝ → Set
 x < y = pos (y - x)
 
+{-
 module <-Characterizations
   (x@(realConstr as M as-cauchy) : ℝ)
   (y@(realConstr bs N bs-cauchy) : ℝ)
@@ -311,6 +313,7 @@ module <-Characterizations
                          in ℚ.+-mono-≤ b≤bsn (ℚ.neg-antimono-≤ asn≤a) )⟩
       bs n ℚ.- as n  ∎
       ))
+-}
 
 _≤_ : ℝ → ℝ → Set
 x ≤ y = nneg (y - x)

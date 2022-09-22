@@ -37,8 +37,8 @@ record cont : Set where
     -- μ : ℚ
     -- ν : ℚ
 
-    cauchy : (a : ℚ) → Cauchy (h a) α
-    ucont :
+    @0 cauchy : (a : ℚ) → Cauchy (h a) α
+    @0 ucont :
       (a b : ℚ) →
       (p n : ℕ) →
       α p ℕ.≤ n →
@@ -74,7 +74,7 @@ capp : cont → ℝ → ℝ
   m≥M : m ℕ.≥ M (ω (suc p))
   m≥M = (ℕ.m⊔n≤o⇒n≤o (α (suc p)) (M (ω (suc p))) m≥)
 
-capp-preserves-≃ : (f : cont) → (x x' : ℝ) → x ≃ x' → capp f x ≃ capp f x'
+@0 capp-preserves-≃ : (f : cont) → (x x' : ℝ) → x ≃ x' → capp f x ≃ capp f x'
 capp-preserves-≃
   (contConstr h α ω cauchy-h ucont)
   (ℝ.realConstr as M cauchy-as)
