@@ -68,7 +68,7 @@ module ≃-Characterization
   Characterization =
     (p : ℕ) →
     Σ ℕ (λ k →
-      (n m : ℕ) →
+      (n : ℕ) →
       n ℕ.≥ k →
       ℚ.∣ as n ℚ.- bs n ∣ ℚ.≤ ½ ^ p)
 
