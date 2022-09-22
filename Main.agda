@@ -12,4 +12,4 @@ open import Data.Rational.Show
 open import examples
 
 main : Main
-main = run (putStrLn (show (as 100)))
+main = run (putStrLn (show (as 500)))

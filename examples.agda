@@ -32,13 +32,18 @@ cont.cauchy x^2-2 = {!!}
 cont.ucont x^2-2 = {!!}  -- Impossible for now.
 
 x^2-2-inc : strictly-increasing x^2-2
-x^2-2-inc = {!!}
+x^2-2-inc = λ x y (p , ½^p≤) →
+    p  -- Should be ok in the interval [1;2].
+  , {!!}  -- Impossible for now.
 
 √2 : ℝ
 √2 = proj₁ (IVT.Iteration.IVT x^2-2 x^2-2-inc 1ℚ 2ℚ {!!} {!!})
 
 as : ℕ → ℚ
 as = ℝ.as √2
+
+
+-- We can compute as n simply by normalizing (C-c C-n):
 
 -- as  5 computes to 107 / 81
 -- as 10 computes to 27697 / 19683
