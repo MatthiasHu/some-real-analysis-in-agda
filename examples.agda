@@ -1,3 +1,5 @@
+{-# OPTIONS --allow-unsolved-metas #-}
+
 module examples where
 
 open import Data.Nat as ℕ using (ℕ; suc; zero)

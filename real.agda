@@ -2,6 +2,7 @@
 
 module real where
 
+-- stdlib
 -- We use version 1.7.1 of the agda standard library.
 
 open import Data.Nat as ℕ using (ℕ; suc; zero)
@@ -19,11 +20,14 @@ open import Relation.Nullary
 open import Algebra.Bundles using (module Ring)
 open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
-open import preliminaries.on-rationals
+-- equality
 
 import Equality.Propositional
 import Erased.With-K
 
+-- ours
+
+open import preliminaries.on-rationals
 
 
 --- Cauchy sequence property ---
@@ -168,7 +172,6 @@ module pos-Characterizations
     as k  ℚ.+ (as n ℚ.- as k)      ≡⟨ add-difference-lemma (as k) (as n) ⟩
     as n                           ∎
 
-{-
   EpsilonAndIndexBound→pos : EpsilonAndIndexBound → pos x
   EpsilonAndIndexBound→pos (p , k , asn≥½^p) =
     let n₀ = M (suc (suc p))
@@ -322,9 +325,8 @@ approxSplitStrict
   x<y
   =
   {!!}
-  where
 
-approxSplit : (x y z : ℝ) → x < y → (z < y) ⊎ (x < z)
+approxSplit : (x y z : ℝ) → x < y → (z ≤ y) ⊎ (x ≤ z)
 approxSplit
   (realConstr as M as-cauchy)
   (realConstr bs N bs-cauchy)
@@ -356,4 +358,3 @@ fromℚ-preserves-< a b a<b = fromℚ-preserves-pos (b ℚ.- a) (ℚ.positive (
   where
   open ℚ.≤-Reasoning
 
--}
