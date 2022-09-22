@@ -1,4 +1,4 @@
--- {-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-unsolved-metas #-}
 
 module real where
 
@@ -21,8 +21,8 @@ open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
 open import preliminaries.on-rationals
 
--- open import Equality.Propositional
--- open import Erased.With-K
+import Equality.Propositional
+import Erased.With-K
 
 
 
