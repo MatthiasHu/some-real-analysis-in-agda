@@ -5,14 +5,16 @@ module preliminaries.on-rationals where
 open import Data.Nat as ℕ using (ℕ; suc; zero)
 import Data.Nat.Properties as ℕ
 open import Data.Integer as ℤ using ()
+import Data.Integer.Properties as ℤ
 open import Data.Rational
 open import Data.Rational.Properties
 open import Data.Product
 open import Data.Sum
 
+open import Relation.Nullary
 open import Relation.Nullary.Decidable
 
-open import Function.Base using (case_of_)
+open import Function.Base using (case_of_; _∘_)
 
 open import Relation.Binary.PropositionalEquality
 
@@ -106,13 +108,25 @@ Positive-½ = tt
   ½ ^ p                  ∎
 
 
---- archimedian properties ---
+--- archimedean properties ---
 
-archimedian : (a : ℚ) → Σ ℕ (λ p → (ℤ.+ 2 / 1) ^ p > a)
-archimedian = {!!}
+archimedean : (a : ℚ) → Σ ℕ (λ p → Erased (a < 2ℚ ^ p))
+archimedean (mkℚ (ℤ.+_ n) d-1 _) = n , [ {!!} ]
+archimedean (mkℚ (ℤ.-[1+_] n) d-1 _) = zero , [ *<* ℤ.-<+ ]
 
-archimedian-ε : (a : ℚ) → @0 Positive a → Σ ℕ (λ p → Erased (½ ^ p < a))
-archimedian-ε = {!!}
+import Relation.Nullary.Decidable as Dec
+
+stable-¬ : {ℓ : _} {A : Set ℓ} → @0 ¬ A → ¬ A
+stable-¬ ¬a a with () ← Erased.With-K.[ ¬a a ]
+
+pos⇒≢0 : ∀ p → @0 Positive p → False (ℤ.∣ ↥ p ∣ ℕ.≟ 0)
+pos⇒≢0 p p>0 = Dec.fromWitnessFalse
+                 (stable-¬ ((≢-sym (ℤ.<⇒≢ (ℤ.positive⁻¹ p>0))) ∘ ℤ.∣n∣≡0⇒n≡0))
+
+archimedean-ε : (a : ℚ) → @0 Positive a → Σ ℕ (λ p → Erased (½ ^ p < a))
+archimedean-ε a a-pos =
+  let (p , _) = archimedean ((1/ a) {n≢0 = pos⇒≢0 a a-pos}) -- pos⇒≢0
+  in p , [ {!!} ]
 
 
 --- on absolute value ---

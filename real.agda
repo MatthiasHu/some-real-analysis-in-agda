@@ -347,7 +347,7 @@ approxSplit
 
 fromℚ-preserves-pos : (a : ℚ) → @0 ℚ.Positive a → pos (fromℚ a)
 fromℚ-preserves-pos a a-positive =
-  let (p , [ ½^p<a ]) = archimedian-ε a a-positive
+  let (p , [ ½^p<a ]) = archimedean-ε a a-positive
   in p , [ ℚ.<⇒≤ ½^p<a ]
 
 fromℚ-preserves-< : (a b : ℚ) → @0 a ℚ.< b → fromℚ a < fromℚ b
