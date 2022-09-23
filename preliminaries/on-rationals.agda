@@ -114,18 +114,19 @@ archimedean : (a : ℚ) → Σ ℕ (λ p → Erased (a < 2ℚ ^ p))
 archimedean (mkℚ (ℤ.+_ n) d-1 _) = n , [ {!!} ]
 archimedean (mkℚ (ℤ.-[1+_] n) d-1 _) = zero , [ *<* ℤ.-<+ ]
 
-import Relation.Nullary.Decidable as Dec
+private
+  import Relation.Nullary.Decidable as Dec
 
-stable-¬ : {ℓ : _} {A : Set ℓ} → @0 ¬ A → ¬ A
-stable-¬ ¬a a with () ← Erased.With-K.[ ¬a a ]
+  stable-¬ : {ℓ : _} {A : Set ℓ} → @0 ¬ A → ¬ A
+  stable-¬ ¬a a with () ← Erased.With-K.[ ¬a a ]
 
-pos⇒≢0 : ∀ p → @0 Positive p → False (ℤ.∣ ↥ p ∣ ℕ.≟ 0)
-pos⇒≢0 p p>0 = Dec.fromWitnessFalse
-                 (stable-¬ ((≢-sym (ℤ.<⇒≢ (ℤ.positive⁻¹ p>0))) ∘ ℤ.∣n∣≡0⇒n≡0))
+  pos⇒≢0 : ∀ p → @0 Positive p → False (ℤ.∣ ↥ p ∣ ℕ.≟ 0)
+  pos⇒≢0 p p>0 = Dec.fromWitnessFalse
+                  (stable-¬ ((≢-sym (ℤ.<⇒≢ (ℤ.positive⁻¹ p>0))) ∘ ℤ.∣n∣≡0⇒n≡0))
 
 archimedean-ε : (a : ℚ) → @0 Positive a → Σ ℕ (λ p → Erased (½ ^ p < a))
 archimedean-ε a a-pos =
-  let (p , _) = archimedean ((1/ a) {n≢0 = pos⇒≢0 a a-pos}) -- pos⇒≢0
+  let (p , _) = archimedean ((1/ a) {n≢0 = pos⇒≢0 a a-pos})
   in p , [ {!!} ]
 
 
