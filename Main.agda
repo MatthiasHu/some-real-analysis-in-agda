@@ -14,6 +14,7 @@ open import Data.Maybe using (just; nothing)
 
 open import examples
 
+
 main : Main
 main = run (do
   putStrLn "Enter n:"
@@ -30,3 +31,4 @@ main = run (do
 -- n = 1500 takes ca 5s
 -- n = 2000 takes ca 9s
 -- (This is ca 40x faster than evaluating by C-c C-n.)
+-- These times are the same with and without erasure annotations ("@0" and "Erased").
