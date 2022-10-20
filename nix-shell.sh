@@ -1,0 +1,1 @@
+nix shell github:MatthiasHu/agda/687be86f5a030441f884cfecdd015034fd02d196

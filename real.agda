@@ -22,6 +22,7 @@ open import Algebra.Properties.Semiring.Exp (Ring.semiring ℚ.+-*-ring)
 
 -- equality
 
+-- This needs Agda 2.6.3 (or rather the development version at this time).
 open import Erased.With-K
 
 -- ours
@@ -133,6 +134,14 @@ nneg (realConstr as M cauchy) = Erased ((p : ℕ) → ℚ.- (½ ^ p) ℚ.≤ as 
 
 pos : ℝ → Set
 pos (realConstr as M cauchy) = Σ ℕ (λ p → Erased (½ ^ p ℚ.≤ as (M (suc p))))
+
+{-
+record pos' (x : ℝ) : Set where
+  open ℝ
+  field
+    p : ℕ
+    @0 prop : ½ ^ p ℚ.≤ as x (M x (suc p))
+-}
 
 module pos-Characterizations
   (x@(realConstr as M cauchy) : ℝ)
